@@ -1,4 +1,4 @@
 package entities;
 
-public class Video {
+public class User {
 }
