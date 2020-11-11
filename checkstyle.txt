@@ -1,2 +1,17 @@
 Starting audit...
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/main/Main.java:75: Line has trailing spaces. [RegexpSingleline]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Movie.java:1: File does not end with a newline. [NewlineAtEndOfFile]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Movie.java:13:18: Parameter duration should be final. [FinalParameters]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Movie.java:13:32: Parameter rating should be final. [FinalParameters]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Movie.java:14:13: '.' is followed by whitespace. [NoWhitespaceAfter]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Movie.java:18:5: Class 'Movie' looks like designed for extension (can be subclassed), but the method 'getDuration' does not have javadoc that explains how to do that safely. If class is not designed for extension consider making the class 'Movie' final or making the method 'getDuration' static/final/abstract/empty, or adding allowed annotation for the method. [DesignForExtension]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Movie.java:22:5: Class 'Movie' looks like designed for extension (can be subclassed), but the method 'getRating' does not have javadoc that explains how to do that safely. If class is not designed for extension consider making the class 'Movie' final or making the method 'getRating' static/final/abstract/empty, or adding allowed annotation for the method. [DesignForExtension]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Video.java:1: File does not end with a newline. [NewlineAtEndOfFile]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Video.java:18:18: Parameter title should be final. [FinalParameters]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Video.java:18:32: Parameter releaseYear should be final. [FinalParameters]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Video.java:18:49: Parameter genres should be final. [FinalParameters]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Video.java:24:5: Class 'Video' looks like designed for extension (can be subclassed), but the method 'getTitle' does not have javadoc that explains how to do that safely. If class is not designed for extension consider making the class 'Video' final or making the method 'getTitle' static/final/abstract/empty, or adding allowed annotation for the method. [DesignForExtension]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Video.java:28:5: Class 'Video' looks like designed for extension (can be subclassed), but the method 'getReleaseYear' does not have javadoc that explains how to do that safely. If class is not designed for extension consider making the class 'Video' final or making the method 'getReleaseYear' static/final/abstract/empty, or adding allowed annotation for the method. [DesignForExtension]
+[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/entities/Video.java:32:5: Class 'Video' looks like designed for extension (can be subclassed), but the method 'getGenres' does not have javadoc that explains how to do that safely. If class is not designed for extension consider making the class 'Video' final or making the method 'getGenres' static/final/abstract/empty, or adding allowed annotation for the method. [DesignForExtension]
 Audit done.
+Checkstyle ends with 14 errors.

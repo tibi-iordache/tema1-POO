@@ -3,6 +3,7 @@ package entities;
 import java.util.ArrayList;
 
 public class Video {
+
     private String title;
 
     private int releaseYear;

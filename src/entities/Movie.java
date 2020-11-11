@@ -1,6 +1,7 @@
 package entities;
 
 public class Movie extends Video {
+
     private int duration;
 
     private double rating;
