@@ -1,17 +1,20 @@
 package entities;
 
+import java.util.ArrayList;
+
 public class Movie extends Video {
 
     private int duration;
 
     private double rating;
 
-    public Movie() {
-        duration = 0;
-        rating = 0;
-    }
+    public Movie(String title,
+                 int releaseYear,
+                 ArrayList<String> genres,
+                 ArrayList<String> cast,
+                 int duration, double rating) {
+        super(title, releaseYear, genres, cast);
 
-    public Movie(int duration, double rating) {
         this. duration = duration;
         this.rating = rating;
     }
@@ -22,5 +25,13 @@ public class Movie extends Video {
 
     public double getRating() {
         return rating;
+    }
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "duration=" + duration +
+                ", rating=" + rating +
+                '}';
     }
 }

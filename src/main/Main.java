@@ -72,8 +72,8 @@ public final class Main {
 
         //TODO add here the entry point to your implementation
 
-//        System.out.println(input.getUsers());
-//        System.out.println(input.getCommands());
+        System.out.println(input.getUsers());
+        System.out.println(input.getCommands());
 
         fileWriter.closeJSON(arrayResult);
     }

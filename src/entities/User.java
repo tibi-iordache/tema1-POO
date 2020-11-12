@@ -1,6 +1,5 @@
 package entities;
 
-import java.net.UnknownServiceException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -24,16 +23,6 @@ public class User {
         this.favoriteMovies = favoriteMovies;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "username='" + username + '\'' +
-                ", subscriptionType='" + subscriptionType + '\'' +
-                ", history=" + history +
-                ", favoriteMovies=" + favoriteMovies +
-                '}';
-    }
-
     public String getUsername() {
         return username;
     }
@@ -48,5 +37,15 @@ public class User {
 
     public ArrayList<String> getFavoriteMovies() {
         return favoriteMovies;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", subscriptionType='" + subscriptionType + '\'' +
+                ", history=" + history +
+                ", favoriteMovies=" + favoriteMovies +
+                '}';
     }
 }

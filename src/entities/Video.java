@@ -10,16 +10,23 @@ public class Video {
 
     private ArrayList<String> genres;
 
+    private ArrayList<String> cast;
+
     public Video() {
         title = null;
         releaseYear = 0;
         genres = null;
+        cast = null;
     }
 
-    public Video(String title, int releaseYear, ArrayList<String> genres) {
+    public Video(String title,
+                 int releaseYear,
+                 ArrayList<String> genres,
+                 ArrayList<String> cast) {
         this.title = title;
         this.releaseYear = releaseYear;
         this.genres = genres;
+        this.cast = cast;
     }
 
     public String getTitle() {
@@ -32,5 +39,19 @@ public class Video {
 
     public ArrayList<String> getGenres() {
         return genres;
+    }
+
+    public ArrayList<String> getCast() {
+        return cast;
+    }
+
+    @Override
+    public String toString() {
+        return "Video{" +
+                "title='" + title + '\'' +
+                ", releaseYear=" + releaseYear +
+                ", genres=" + genres +
+                ", cast=" + cast +
+                '}';
     }
 }
