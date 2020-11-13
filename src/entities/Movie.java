@@ -6,32 +6,27 @@ public class Movie extends Video {
 
     private int duration;
 
-    private double rating;
-
     public Movie(String title,
-                 int releaseYear,
-                 ArrayList<String> genres,
                  ArrayList<String> cast,
-                 int duration, double rating) {
-        super(title, releaseYear, genres, cast);
+                 ArrayList<String> genres,
+                 int releaseYear,
+                 int duration) {
+        super(title, releaseYear, cast, genres);
 
         this. duration = duration;
-        this.rating = rating;
     }
 
     public int getDuration() {
         return duration;
     }
 
-    public double getRating() {
-        return rating;
-    }
-
     @Override
     public String toString() {
-        return "Movie{" +
-                "duration=" + duration +
-                ", rating=" + rating +
-                '}';
+        return "MovieInputData{" + "title= "
+                + super.getTitle() + "year= "
+                + super.getReleaseYear() + "duration= "
+                + duration + "cast {"
+                + super.getCast() + " }\n"
+                + "genres {" + super.getGenres() + " }\n ";
     }
 }

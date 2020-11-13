@@ -8,9 +8,9 @@ public class Video {
 
     private int releaseYear;
 
-    private ArrayList<String> genres;
-
     private ArrayList<String> cast;
+
+    private ArrayList<String> genres;
 
     public Video() {
         title = null;
@@ -21,12 +21,12 @@ public class Video {
 
     public Video(String title,
                  int releaseYear,
-                 ArrayList<String> genres,
-                 ArrayList<String> cast) {
+                 ArrayList<String> cast,
+                 ArrayList<String> genres) {
         this.title = title;
         this.releaseYear = releaseYear;
-        this.genres = genres;
         this.cast = cast;
+        this.genres = genres;
     }
 
     public String getTitle() {
@@ -37,12 +37,12 @@ public class Video {
         return releaseYear;
     }
 
-    public ArrayList<String> getGenres() {
-        return genres;
-    }
-
     public ArrayList<String> getCast() {
         return cast;
+    }
+
+    public ArrayList<String> getGenres() {
+        return genres;
     }
 
     @Override

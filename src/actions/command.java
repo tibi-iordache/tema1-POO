@@ -1,12 +1,12 @@
 package actions;
 
-import entities.*;
-
 public interface command {
 
-    void addVideoToFavorite(Video video);
+    void addVideoToFavorite(String video);
 
-    void viewVideo(Video video);
+    void viewVideo(String video);
 
-    void rateVideo(Video video);
+    void rateMovie(String movie, Double grade);
+
+    void rateShow(String show, Integer seasonNo, Double grade);
 }

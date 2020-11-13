@@ -1,9 +1,12 @@
 package entities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
+import actions.*;
+import entertainment.Season;
 
-public class User {
+public class User implements command {
 
     private String username;
 
@@ -13,6 +16,10 @@ public class User {
 
     private ArrayList<String> favoriteMovies;
 
+    private Map<String, Double> ratingMovieList;
+
+    private Map<String, Map<Integer, Double>> ratingSeasonList;
+
     public User(String username,
                 String subscriptionType,
                 Map<String, Integer> history,
@@ -21,6 +28,43 @@ public class User {
         this.subscriptionType = subscriptionType;
         this.history = history;
         this.favoriteMovies = favoriteMovies;
+        this.ratingMovieList = new HashMap<>();
+        this.ratingSeasonList = new HashMap<>();
+    }
+
+    public void addVideoToFavorite(String video) {
+        if (history.containsKey(video))
+            favoriteMovies.add(video);
+    }
+
+    public void viewVideo(String video) {
+        if (history.containsKey(video)) {
+            history.put(video, history.get(video) + 1);
+        }
+        else {
+            history.put(video, 1);
+        }
+    }
+
+    public void rateMovie(String movie, Double grade) {
+        if (history.containsKey(movie)) {
+            // check if it already has a rating
+            if (!ratingMovieList.containsKey(movie)) {
+                ratingMovieList.put(movie, grade);
+            }
+        }
+    }
+
+    public void rateShow(String show, Integer seasonNo, Double grade) {
+        if(history.containsKey(show)) {
+            // check if it already has a rating
+            if (!ratingSeasonList.containsKey(show)) {
+                Map<Integer, Double> seasonGrade = new HashMap<>();
+                seasonGrade.put(seasonNo, grade);
+
+                ratingSeasonList.put(show, seasonGrade);
+            }
+        }
     }
 
     public String getUsername() {
@@ -39,6 +83,14 @@ public class User {
         return favoriteMovies;
     }
 
+    public Map<String, Double> getRatingMovieList() {
+        return ratingMovieList;
+    }
+
+    public Map<String, Map<Integer, Double>> getRatingSeasonList() {
+        return ratingSeasonList;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -46,6 +98,8 @@ public class User {
                 ", subscriptionType='" + subscriptionType + '\'' +
                 ", history=" + history +
                 ", favoriteMovies=" + favoriteMovies +
+                ", ratingMovieList=" + ratingMovieList +
+                ", ratingSeasonList=" + ratingSeasonList +
                 '}';
     }
 }
