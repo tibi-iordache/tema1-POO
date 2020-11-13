@@ -137,13 +137,31 @@ public final class Main {
 
                     for (User user : users) {
                         if (user.getUsername().equals(userName)) {
-                            user.addVideoToFavorite(videoName);
+                            String check = user.addVideoToFavorite(videoName);
 
-                            JSONObject output = fileWriter.writeFile(input.getCommands().get(i).getActionId(),
-                                    null,
-                                    "success -> " + videoName + " was added as favourite");
+                            if (check.equals("succes")) {
+                                JSONObject output = fileWriter.writeFile(input.getCommands().get(i).getActionId(),
+                                        null,
+                                        "success -> " + videoName + " was added as favourite");
 
-                            arrayResult.add(output);
+                                arrayResult.add(output);
+                            }
+
+                            if (check.equals("duplicate")) {
+                                JSONObject output = fileWriter.writeFile(input.getCommands().get(i).getActionId(),
+                                        null,
+                                        "error -> " + videoName + " is already in favourite list");
+
+                                arrayResult.add(output);
+                            }
+
+                            if (check.equals("not seen")) {
+                                JSONObject output = fileWriter.writeFile(input.getCommands().get(i).getActionId(),
+                                        null,
+                                        "error -> " + videoName + " is not seen");
+
+                                arrayResult.add(output);
+                            }
                         }
                     }
 
@@ -206,6 +224,9 @@ public final class Main {
 
             }
         }
+
+        System.out.println(movies);
+        System.out.println(serials);
 
         fileWriter.closeJSON(arrayResult);
     }

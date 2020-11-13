@@ -2,7 +2,7 @@ package actions;
 
 public interface command {
 
-    void addVideoToFavorite(String video);
+    String addVideoToFavorite(String video);
 
     void viewVideo(String video);
 

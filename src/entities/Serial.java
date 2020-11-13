@@ -10,6 +10,8 @@ public class Serial extends Video{
 
     private ArrayList<Season> seasons;
 
+    private float rating;
+
     public Serial(String title,
                   ArrayList<String> cast,
                   ArrayList<String> genres,
@@ -30,15 +32,23 @@ public class Serial extends Video{
         return seasons;
     }
 
-    @Override
-    public String toString() {
-        return "SerialInputData{" + " title= "
-                + super.getTitle() + " " + " year= "
-                + super.getReleaseYear() + " cast {"
-                + super.getCast() + " }\n" + " genres {"
-                + super.getGenres() + " }\n "
-                + " numberSeason= " + numberOfSeasons
-                + ", seasons=" + seasons + "\n\n" + '}';
+    public float getRating() {
+        return rating;
     }
 
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
+    @Override
+    public String toString() {
+        return "Serial{" + "title = " + super.getTitle()
+                + ", year = " + super.getReleaseYear()
+                + ", genres = " + super.getGenres()
+                + ", cast " + super.getCast()
+                + "numberOfSeasons=" + numberOfSeasons
+                + ", seasons=" + seasons
+                + ", rating=" + rating
+                + '}';
+    }
 }

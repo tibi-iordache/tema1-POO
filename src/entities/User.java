@@ -32,9 +32,18 @@ public class User implements command {
         this.ratingSeasonList = new HashMap<>();
     }
 
-    public void addVideoToFavorite(String video) {
-        if (history.containsKey(video))
-            favoriteMovies.add(video);
+    public String addVideoToFavorite(String video) {
+        if (history.containsKey(video)) {
+            if (!favoriteMovies.contains(video)) {
+                favoriteMovies.add(video);
+
+                return "succes";
+            }
+            else
+                return "duplicate";
+        }
+
+        return "not seen";
     }
 
     public void viewVideo(String video) {

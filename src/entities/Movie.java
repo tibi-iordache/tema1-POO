@@ -6,6 +6,8 @@ public class Movie extends Video {
 
     private int duration;
 
+    private float rating;
+
     public Movie(String title,
                  ArrayList<String> cast,
                  ArrayList<String> genres,
@@ -16,17 +18,28 @@ public class Movie extends Video {
         this. duration = duration;
     }
 
+
+
     public int getDuration() {
         return duration;
     }
 
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
     @Override
     public String toString() {
-        return "MovieInputData{" + "title= "
-                + super.getTitle() + "year= "
-                + super.getReleaseYear() + "duration= "
-                + duration + "cast {"
-                + super.getCast() + " }\n"
-                + "genres {" + super.getGenres() + " }\n ";
+        return "Movie{" +"title = " + super.getTitle()
+                + ", year = " + super.getReleaseYear()
+                + ", genres = " + super.getGenres()
+                + ", cast " + super.getCast()
+                + ", duration=" + duration
+                + ", rating=" + rating
+                + '}';
     }
 }
