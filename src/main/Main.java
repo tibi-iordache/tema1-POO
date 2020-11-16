@@ -1,10 +1,17 @@
 package main;
 
+import actor.ActorsAwards;
 import checker.Checkstyle;
 import checker.Checker;
 import common.Constants;
-import entities.*;
-import actions.*;
+import entertainment.Season;
+import entities.Actor;
+import entities.Movie;
+import entities.Serial;
+import entities.SerialSeason;
+import entities.User;
+import entities.Video;
+import fileio.ActionInputData;
 import fileio.Input;
 import fileio.InputLoader;
 import fileio.Writer;
@@ -18,10 +25,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-import static common.Constants.COMMAND;
-import static common.Constants.USER;
+import static common.Constants.*;
 
 /**
  * The entry point to this homework. It runs the checker that tests your implentation.
@@ -79,19 +87,12 @@ public final class Main {
         JSONArray arrayResult = new JSONArray();
 
         //TODO add here the entry point to your implementation
-
-//        System.out.println(input.getUsers());
-//        System.out.println(input.getMovies());
-//        System.out.println(input.getSerials());
-//        System.out.println(input.getActors());
-//        System.out.println(input.getCommands());
-
         /*
         * Forming the data base
         * */
         ArrayList<User> users = new ArrayList<>();
 
-        for(int i = 0; i < input.getUsers().size(); i++) {
+        for (int i = 0; i < input.getUsers().size(); i++) {
             users.add(new User(input.getUsers().get(i).getUsername(),
                     input.getUsers().get(i).getSubscriptionType(),
                     input.getUsers().get(i).getHistory(),
@@ -100,133 +101,236 @@ public final class Main {
 
         ArrayList<Movie> movies = new ArrayList<>();
 
-        for(int i = 0; i < input.getMovies().size(); i++) {
+        for (int i = 0; i < input.getMovies().size(); i++) {
             movies.add(new Movie(input.getMovies().get(i).getTitle(),
-                                 input.getMovies().get(i).getCast(),
-                                 input.getMovies().get(i).getGenres(),
-                                 input.getMovies().get(i).getYear(),
-                                 input.getMovies().get(i).getDuration()));
+                    input.getMovies().get(i).getCast(),
+                    input.getMovies().get(i).getGenres(),
+                    input.getMovies().get(i).getYear(),
+                    input.getMovies().get(i).getDuration()));
         }
 
         ArrayList<Serial> serials = new ArrayList<>();
 
-        for(int i = 0; i < input.getSerials().size(); i++) {
+        for (int i = 0; i < input.getSerials().size(); i++) {
+            ArrayList<Season> seasonsInput = input.getSerials().get(i).getSeasons();
+
+            int seasonCounter = 1;
+
+            ArrayList<SerialSeason> serialSeasons = new ArrayList<>();
+
+            for (Season seasonIterator : seasonsInput) {
+                SerialSeason seasonToBeAdded = new SerialSeason(seasonIterator.getDuration(), seasonCounter++);
+
+                serialSeasons.add(seasonToBeAdded);
+            }
+
             serials.add(new Serial(input.getSerials().get(i).getTitle(),
-                                   input.getSerials().get(i).getCast(),
-                                   input.getSerials().get(i).getGenres(),
-                                   input.getSerials().get(i).getNumberSeason(),
-                                   input.getSerials().get(i).getSeasons(),
-                                   input.getSerials().get(i).getYear()));
+                    input.getSerials().get(i).getCast(),
+                    input.getSerials().get(i).getGenres(),
+                    input.getSerials().get(i).getNumberSeason(),
+                    serialSeasons,
+                    input.getSerials().get(i).getYear()));
         }
 
         ArrayList<Actor> actors = new ArrayList<>();
 
-        for(int i = 0; i < input.getActors().size(); i++) {
+        for (int i = 0; i < input.getActors().size(); i++) {
             actors.add(new Actor(input.getActors().get(i).getName(),
-                                 input.getActors().get(i).getCareerDescription(),
-                                 input.getActors().get(i).getFilmography(),
-                                 input.getActors().get(i).getAwards()));
+                    input.getActors().get(i).getCareerDescription(),
+                    input.getActors().get(i).getFilmography(),
+                    input.getActors().get(i).getAwards()));
         }
 
-        for(int i = 0; i < input.getCommands().size(); i++) {
-            if (input.getCommands().get(i).getActionType().equals(COMMAND)) {
-                if (input.getCommands().get(i).getType().equals("favorite")) {
-                    String userName = input.getCommands().get(i).getUsername();
+        for (int i = 0; i < input.getCommands().size(); i++) {
+            ActionInputData currentCommand = input.getCommands().get(i);
 
-                    String videoName = input.getCommands().get(i).getTitle();
+            int actionId = currentCommand.getActionId();
 
-                    for (User user : users) {
-                        if (user.getUsername().equals(userName)) {
-                            String check = user.addVideoToFavorite(videoName);
+            String actionType = currentCommand.getActionType();
 
-                            if (check.equals("succes")) {
-                                JSONObject output = fileWriter.writeFile(input.getCommands().get(i).getActionId(),
-                                        null,
-                                        "success -> " + videoName + " was added as favourite");
+            String userName = currentCommand.getUsername();
 
-                                arrayResult.add(output);
+            String videoName = currentCommand.getTitle();
+
+            JSONObject output;
+
+            switch (actionType) {
+                case COMMAND -> {
+                    String commandType = currentCommand.getType();
+
+                    switch (commandType) {
+                        case "favorite" -> {
+                            for (User user : users) {
+                                if (user.getUsername().equals(userName)) {
+                                    String check = user.addVideoToFavorite(videoName);
+
+                                    switch (check) {
+                                        case "success" -> {
+                                            output = fileWriter.writeFile(actionId,
+                                                    null,
+                                                    "success -> " + videoName + " was added as favourite");
+
+                                            arrayResult.add(output);
+                                        }
+
+                                        case "duplicate" -> {
+                                            output = fileWriter.writeFile(actionId,
+                                                    null,
+                                                    "error -> " + videoName + " is already in favourite list");
+
+                                            arrayResult.add(output);
+                                        }
+
+                                        case "not seen" -> {
+
+                                            output = fileWriter.writeFile(actionId,
+                                                    null,
+                                                    "error -> " + videoName + " is not seen");
+
+                                            arrayResult.add(output);
+                                        }
+                                    }
+                                }
                             }
+                        }
 
-                            if (check.equals("duplicate")) {
-                                JSONObject output = fileWriter.writeFile(input.getCommands().get(i).getActionId(),
-                                        null,
-                                        "error -> " + videoName + " is already in favourite list");
+                        case "view" -> {
+                            for (User user : users) {
+                                if (user.getUsername().equals(userName)) {
+                                    user.viewVideo(videoName);
 
-                                arrayResult.add(output);
+                                    output = fileWriter.writeFile(actionId,
+                                            null,
+                                            "success -> " + videoName + " was viewed with total views of "
+                                                    + user.getHistory().get(videoName));
+
+                                    arrayResult.add(output);
+                                }
                             }
+                        }
 
-                            if (check.equals("not seen")) {
-                                JSONObject output = fileWriter.writeFile(input.getCommands().get(i).getActionId(),
-                                        null,
-                                        "error -> " + videoName + " is not seen");
+                        case "rating" -> {
+                            for (User user : users) {
+                                if (user.getUsername().equals(userName)) {
+                                    String check;
 
-                                arrayResult.add(output);
+                                    if (input.getCommands().get(i).getSeasonNumber() != 0) {
+                                        // serial rating
+                                        check = user.rateShow(videoName,
+                                                input.getCommands().get(i).getSeasonNumber(),
+                                                input.getCommands().get(i).getGrade(),
+                                                serials);
+                                    } else {
+                                        // movie rating
+                                        check = user.rateMovie(videoName, input.getCommands().get(i).getGrade(), movies);
+                                    }
+
+                                    switch (check) {
+                                        case "success" -> {
+                                            output = fileWriter.writeFile(actionId,
+                                                    null,
+                                                    "success -> " + videoName + " was rated with "
+                                                            + input.getCommands().get(i).getGrade() + " by " + userName);
+                                            arrayResult.add(output);
+                                        }
+                                        case "not seen" -> {
+                                            output = fileWriter.writeFile(actionId,
+                                                    null,
+                                                    "error -> " + videoName + " is not seen");
+                                            arrayResult.add(output);
+                                        }
+                                        case "already rated" -> {
+                                            output = fileWriter.writeFile(actionId,
+                                                    null,
+                                                    "error -> " + videoName + " has been already rated");
+                                            arrayResult.add(output);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
-
-                    continue;
                 }
+                case QUERY -> {
+                    String objectType = currentCommand.getObjectType();
+                    switch (objectType) {
+                        case "users" -> {
+                            ArrayList<User> result = users.get(0).searchUsersByNumberOfRatings(users,
+                                    input.getCommands().get(i).getNumber());
 
-                if (input.getCommands().get(i).getType().equals("view")) {
-                    String userName = input.getCommands().get(i).getUsername();
+                            StringBuilder builder = new StringBuilder();
 
-                    String videoName = input.getCommands().get(i).getTitle();
+                            for (int k = 0; k < result.size(); k++) {
+                                builder.append(result.get(k).getUsername());
 
-                    for (User user : users) {
-                        if (user.getUsername().equals(userName)) {
-                            user.viewVideo(videoName);
+                                if (k != (result.size() - 1))
+                                    builder.append(", ");
+                            }
 
-                            JSONObject output = fileWriter.writeFile(input.getCommands().get(i).getActionId(),
+                            output = fileWriter.writeFile(actionId,
                                     null,
-                                    "success -> " + videoName + " was viewed with total views of " + user.getHistory().get(videoName));
+                                    "Query result: [" + builder + "]");
 
                             arrayResult.add(output);
                         }
-                    }
 
-                    continue;
-                }
+                        case "actors" -> {
+                            String commandCriteria = currentCommand.getCriteria();
+                            String sortType = currentCommand.getSortType();
+                            switch (commandCriteria) {
+                                case "average" -> {
+                                    int numberOfActors = currentCommand.getNumber();
+                                    ArrayList<String> firstNActors = (new User()).searchAverageActors(users, movies, serials, actors, numberOfActors, sortType);
 
-                if (input.getCommands().get(i).getType().equals("rating")) {
-                    String userName = input.getCommands().get(i).getUsername();
+                                    StringBuilder builder = new StringBuilder();
 
-                    String videoName = input.getCommands().get(i).getTitle();
+                                    for (int k = 0; k < firstNActors.size(); k++) {
+                                        builder.append(firstNActors.get(k));
 
-                    for (User user : users) {
-                        if (user.getUsername().equals(userName)) {
-                            if (input.getCommands().get(i).getSeasonNumber() != 0) {
-                                // serial rating
-                                user.rateShow(videoName, input.getCommands().get(i).getSeasonNumber(), input.getCommands().get(i).getGrade());
+                                        if (k != (firstNActors.size() - 1))
+                                            builder.append(", ");
+                                    }
 
-                                JSONObject output = fileWriter.writeFile(input.getCommands().get(i).getActionId(),
-                                        null,
-                                        "success -> " + videoName + " was rated with " + input.getCommands().get(i).getGrade() + " by " + userName);
+                                    output = fileWriter.writeFile(actionId,
+                                            null,
+                                            "Query result: [" + builder + "]");
 
-                                arrayResult.add(output);
-                            }
-                            else {
-                                // movie rating
-                                user.rateMovie(videoName, input.getCommands().get(i).getGrade());
+                                    arrayResult.add(output);
+                                }
 
-                                JSONObject output = fileWriter.writeFile(input.getCommands().get(i).getActionId(),
-                                        null,
-                                        "success -> " + videoName + " was rated with " + input.getCommands().get(i).getGrade() + " by " + userName);
+                                case "awards" -> {
+                                    List<String> awardsToBeSearchedBy = currentCommand.getFilters().get(3);
 
-                                arrayResult.add(output);
+                                    ArrayList<String> result = (new User()).searchActorsByAwards(actors, awardsToBeSearchedBy, sortType);
 
+                                    StringBuilder builder = new StringBuilder();
+
+                                    for (int k = 0; k < result.size(); k++) {
+                                        builder.append(result.get(k));
+
+                                        if (k != (result.size() - 1))
+                                            builder.append(", ");
+                                    }
+
+                                    output = fileWriter.writeFile(actionId,
+                                            null,
+                                            "Query result: [" + builder + "]");
+
+                                    arrayResult.add(output);
+                                }
+
+                                case "filter_description" -> {
+//                                    TODO
+                                }
                             }
                         }
+                        case "movies" -> {
+//                            TODO
+                        }
                     }
-
-                    continue;
                 }
-
             }
         }
-
-        System.out.println(movies);
-        System.out.println(serials);
 
         fileWriter.closeJSON(arrayResult);
     }

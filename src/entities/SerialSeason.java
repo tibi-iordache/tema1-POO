@@ -2,25 +2,20 @@ package entities;
 
 import java.util.ArrayList;
 
-public class Movie extends Video {
+public class SerialSeason {
+    private int currentSeason;
+
     private int duration;
 
     private ArrayList<Double> rating;
 
     private Double finalRating;
 
-    public Movie(String title,
-                 ArrayList<String> cast,
-                 ArrayList<String> genres,
-                 int releaseYear,
-                 int duration) {
-        super(title, releaseYear, cast, genres);
-        this. duration = duration;
+    public SerialSeason(int currentSeason,
+                        int duration) {
+        this.currentSeason = currentSeason;
+        this.duration = duration;
         this.rating = new ArrayList<>();
-    }
-
-    public int getDuration() {
-        return duration;
     }
 
     public Double calculateRating() {
@@ -28,25 +23,31 @@ public class Movie extends Video {
         Double ratingNo = Double.valueOf(rating.size());
 
         for (int i = 0; i < rating.size(); i++) {
-            ratingSum = Double.sum(ratingSum, rating.get(i));
+            ratingSum = ratingSum.sum(ratingSum, rating.get(i));
         }
-
         if (ratingNo > 0) {
             return ratingSum / ratingNo;
         }
 
-        return 0d;
+        return  0d;
     }
 
     public void addRating(Double grade) {
         rating.add(grade);
     }
 
+    public int getCurrentSeason() {
+        return currentSeason;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
     public ArrayList<Double> getRating() {
         return rating;
     }
 
-    @Override
     public Double getFinalRating() {
         return finalRating;
     }
@@ -57,12 +58,9 @@ public class Movie extends Video {
 
     @Override
     public String toString() {
-        return "Movie{" +"title = " + super.getTitle()
-                + ", year = " + super.getReleaseYear()
-                + ", genres = " + super.getGenres()
-                + ", cast " + super.getCast()
-                + ", duration=" + duration
-                + ", rating=" + rating
-                + '}';
+        return "ShowSeason{" +
+                "currentSeason=" + currentSeason +
+                ", duration=" + duration +
+                '}';
     }
 }

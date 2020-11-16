@@ -4,8 +4,7 @@ import actor.ActorsAwards;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class Actor {
-
+public class Actor implements Comparable {
     private String name;
 
     private String careerDescription;
@@ -14,13 +13,18 @@ public class Actor {
 
     private Map<ActorsAwards, Integer> awards;
 
+    private Double rating;
+
     public Actor(String name,
                  String careerDescription,
                  ArrayList<String> filmography,
                  Map<ActorsAwards, Integer> awards) {
         this.name = name;
+
         this.careerDescription = careerDescription;
+
         this.filmography = filmography;
+
         this.awards = awards;
     }
 
@@ -40,6 +44,14 @@ public class Actor {
         return awards;
     }
 
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
     @Override
     public String toString() {
         return "Actor{" +
@@ -47,6 +59,18 @@ public class Actor {
                 ", careerDescription='" + careerDescription + '\'' +
                 ", filmography=" + filmography +
                 ", awards=" + awards +
+                ", rating=" + rating +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        int compareChecker = Double.compare(this.getRating(), ((Actor)o).getRating());
+
+        if (compareChecker == 0) {
+            return this.getName().compareTo(((Actor)o).getName());
+        }
+
+        return compareChecker;
     }
 }

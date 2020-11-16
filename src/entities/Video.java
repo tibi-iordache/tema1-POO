@@ -3,7 +3,6 @@ package entities;
 import java.util.ArrayList;
 
 public class Video {
-
     private String title;
 
     private int releaseYear;
@@ -43,6 +42,10 @@ public class Video {
 
     public ArrayList<String> getGenres() {
         return genres;
+    }
+
+    public Double getFinalRating() {
+        return 0d;
     }
 
     @Override

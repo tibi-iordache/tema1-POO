@@ -1,5 +1,5 @@
 package actions;
 
-public interface suggestions {
+public interface Suggestions {
 //    TODO
 }
