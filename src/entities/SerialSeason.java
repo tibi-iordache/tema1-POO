@@ -29,7 +29,7 @@ public class SerialSeason {
             return ratingSum / ratingNo;
         }
 
-        return  0d;
+        return 0d;
     }
 
     public void addRating(Double grade) {

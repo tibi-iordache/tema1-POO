@@ -1,5 +1,7 @@
 package entities;
 
+import entertainment.Genre;
+
 import java.util.ArrayList;
 
 public class Video {
@@ -9,7 +11,7 @@ public class Video {
 
     private ArrayList<String> cast;
 
-    private ArrayList<String> genres;
+    private ArrayList<Genre> genres;
 
     public Video() {
         title = null;
@@ -21,7 +23,7 @@ public class Video {
     public Video(String title,
                  int releaseYear,
                  ArrayList<String> cast,
-                 ArrayList<String> genres) {
+                 ArrayList<Genre> genres) {
         this.title = title;
         this.releaseYear = releaseYear;
         this.cast = cast;
@@ -40,12 +42,8 @@ public class Video {
         return cast;
     }
 
-    public ArrayList<String> getGenres() {
+    public ArrayList<Genre> getGenres() {
         return genres;
-    }
-
-    public Double getFinalRating() {
-        return 0d;
     }
 
     @Override

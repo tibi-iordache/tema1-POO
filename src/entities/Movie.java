@@ -1,5 +1,8 @@
 package entities;
 
+import databases.UserDataBase;
+import entertainment.Genre;
+
 import java.util.ArrayList;
 
 public class Movie extends Video {
@@ -9,13 +12,17 @@ public class Movie extends Video {
 
     private Double finalRating;
 
+    public Movie(){
+
+    }
+
     public Movie(String title,
                  ArrayList<String> cast,
-                 ArrayList<String> genres,
+                 ArrayList<Genre> genres,
                  int releaseYear,
                  int duration) {
         super(title, releaseYear, cast, genres);
-        this. duration = duration;
+        this.duration = duration;
         this.rating = new ArrayList<>();
     }
 
@@ -38,6 +45,29 @@ public class Movie extends Video {
         return 0d;
     }
 
+    public int getNumberOfFavorites(UserDataBase usersDataBase) {
+        int number = 0;
+
+        for(User userIterator : usersDataBase.getUsers()) {
+            if (userIterator.getFavoriteMovies().contains(this.getTitle()))
+                number++;
+        }
+
+        return number;
+    }
+
+    public int getNumberOfViews(UserDataBase usersDataBase) {
+        int number = 0;
+
+        for (User userIterator : usersDataBase.getUsers()) {
+            if (userIterator.getHistory().containsKey(this.getTitle())) {
+                number += userIterator.getHistory().get(this.getTitle());
+            }
+        }
+
+        return number;
+    }
+
     public void addRating(Double grade) {
         rating.add(grade);
     }
@@ -46,7 +76,6 @@ public class Movie extends Video {
         return rating;
     }
 
-    @Override
     public Double getFinalRating() {
         return finalRating;
     }
@@ -57,7 +86,7 @@ public class Movie extends Video {
 
     @Override
     public String toString() {
-        return "Movie{" +"title = " + super.getTitle()
+        return "Movie{" + "title = " + super.getTitle()
                 + ", year = " + super.getReleaseYear()
                 + ", genres = " + super.getGenres()
                 + ", cast " + super.getCast()

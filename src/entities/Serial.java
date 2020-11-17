@@ -1,5 +1,8 @@
 package entities;
 
+import databases.UserDataBase;
+import entertainment.Genre;
+
 import java.util.ArrayList;
 
 public class Serial extends Video {
@@ -9,9 +12,13 @@ public class Serial extends Video {
 
     private Double finalRating;
 
+    public Serial() {
+
+    }
+
     public Serial(String title,
                   ArrayList<String> cast,
-                  ArrayList<String> genres,
+                  ArrayList<Genre> genres,
                   int numberOfSeasons,
                   ArrayList<SerialSeason> seasons,
                   int releaseYear) {
@@ -36,6 +43,39 @@ public class Serial extends Video {
         return 0d;
     }
 
+    public int getDuration() {
+        int duration = 0;
+
+        for (SerialSeason seasonIterator : seasons) {
+            duration += seasonIterator.getDuration();
+        }
+
+        return duration;
+    }
+
+    public int getNumberOfFavorites(UserDataBase usersDataBase) {
+        int number = 0;
+
+        for(User userIterator : usersDataBase.getUsers()) {
+            if (userIterator.getFavoriteMovies().contains(this.getTitle()))
+                number++;
+        }
+
+        return number;
+    }
+
+    public int getNumberOfViews(UserDataBase userDataBase) {
+        int number = 0;
+
+        for (User userIterator : userDataBase.getUsers()) {
+            if (userIterator.getHistory().containsKey(this.getTitle())) {
+                number += userIterator.getHistory().get(this.getTitle());
+            }
+        }
+
+        return number;
+    }
+
     public int getNumberOfSeasons() {
         return numberOfSeasons;
     }
@@ -44,7 +84,6 @@ public class Serial extends Video {
         return seasons;
     }
 
-    @Override
     public Double getFinalRating() {
         return finalRating;
     }

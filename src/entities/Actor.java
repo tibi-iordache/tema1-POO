@@ -4,7 +4,7 @@ import actor.ActorsAwards;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class Actor implements Comparable {
+public class Actor {
     private String name;
 
     private String careerDescription;
@@ -44,6 +44,16 @@ public class Actor implements Comparable {
         return awards;
     }
 
+    public int getAwardsNo() {
+        int number = 0;
+
+        for (Map.Entry<ActorsAwards, Integer> iterator : this.getAwards().entrySet()) {
+            number += iterator.getValue();
+        }
+
+        return number;
+    }
+
     public Double getRating() {
         return rating;
     }
@@ -61,16 +71,5 @@ public class Actor implements Comparable {
                 ", awards=" + awards +
                 ", rating=" + rating +
                 '}';
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        int compareChecker = Double.compare(this.getRating(), ((Actor)o).getRating());
-
-        if (compareChecker == 0) {
-            return this.getName().compareTo(((Actor)o).getName());
-        }
-
-        return compareChecker;
     }
 }
