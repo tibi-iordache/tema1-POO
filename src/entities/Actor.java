@@ -1,6 +1,10 @@
 package entities;
 
 import actor.ActorsAwards;
+import databases.MovieDataBase;
+import databases.SerialDataBase;
+import databases.UserDataBase;
+
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -52,6 +56,35 @@ public class Actor {
         }
 
         return number;
+    }
+
+    public Double calculateRating(MovieDataBase movies,
+                                  SerialDataBase serials) {
+        double ratingsSum = 0d;
+        double ratingsNumber = 0d;
+
+        for (Movie movieIterator : movies.getMovies()) {
+            if (movieIterator.getCast().contains(this.getName()))
+                if (Double.compare(movieIterator.calculateRating(), 0d) > 0) {
+                    ratingsSum += movieIterator.calculateRating();
+
+                    ratingsNumber++;
+                }
+        }
+
+        for (Serial serialIerator : serials.getSerials()) {
+            if (serialIerator.getCast().contains(this.getName()))
+                if (Double.compare(serialIerator.calculateRating(), 0d) > 0) {
+                    ratingsSum += serialIerator.calculateRating();
+
+                    ratingsNumber++;
+                }
+        }
+
+        if (Double.compare(ratingsNumber, 0d) == 0)
+            return 0d;
+        else
+            return ratingsSum / ratingsNumber;
     }
 
     public Double getRating() {

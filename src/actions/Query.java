@@ -17,12 +17,11 @@ public interface Query {
                                                  int n,
                                                  String sortType);
 
-    ArrayList<Actor> searchAverageActors(ArrayList<User> userDataBase,
-                                          ArrayList<Movie> moviesDataBase,
-                                          ArrayList<Serial> serialsDataBase,
-                                          ArrayList<Actor> actorsDataBase,
-                                          int n,
-                                          String sortType);
+    ArrayList<Actor> searchAverageActors(MovieDataBase movies,
+                                         SerialDataBase serials,
+                                         ActorDataBase actors,
+                                         int n,
+                                         String sortType);
 
     ArrayList<Actor> searchActorsByAwards(ArrayList<Actor> actorsDataBase,
                                            List<String> awardsSearched,

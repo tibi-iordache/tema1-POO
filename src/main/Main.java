@@ -116,7 +116,7 @@ public final class Main {
 
             String sortType =currentCommand.getSortType();
 
-            JSONObject output;
+            JSONObject output = null;
 
             switch (actionType) {
                 case COMMAND -> {
@@ -134,7 +134,7 @@ public final class Main {
                                                     null,
                                                     "success -> " + videoName + " was added as favourite");
 
-                                            arrayResult.add(output);
+
                                         }
 
                                         case "duplicate" -> {
@@ -142,7 +142,6 @@ public final class Main {
                                                     null,
                                                     "error -> " + videoName + " is already in favourite list");
 
-                                            arrayResult.add(output);
                                         }
 
                                         case "not seen" -> {
@@ -151,9 +150,12 @@ public final class Main {
                                                     null,
                                                     "error -> " + videoName + " is not seen");
 
-                                            arrayResult.add(output);
                                         }
                                     }
+
+                                    arrayResult.add(output);
+
+                                    break;
                                 }
                             }
                         }
@@ -169,6 +171,8 @@ public final class Main {
                                                     + user.getHistory().get(videoName));
 
                                     arrayResult.add(output);
+
+                                    break;
                                 }
                             }
                         }
@@ -195,21 +199,22 @@ public final class Main {
                                                     null,
                                                     "success -> " + videoName + " was rated with "
                                                             + input.getCommands().get(i).getGrade() + " by " + userName);
-                                            arrayResult.add(output);
                                         }
                                         case "not seen" -> {
                                             output = fileWriter.writeFile(actionId,
                                                     null,
                                                     "error -> " + videoName + " is not seen");
-                                            arrayResult.add(output);
                                         }
                                         case "already rated" -> {
                                             output = fileWriter.writeFile(actionId,
                                                     null,
                                                     "error -> " + videoName + " has been already rated");
-                                            arrayResult.add(output);
                                         }
                                     }
+
+                                    arrayResult.add(output);
+
+                                    break;
                                 }
                             }
                         }
@@ -254,10 +259,9 @@ public final class Main {
                                     int numberOfActors = currentCommand.getNumber();
 
                                     result = commandUser.
-                                            listOfActorsToListOfString(commandUser.searchAverageActors(users.getUsers(),
-                                                                                        movies.getMovies(),
-                                                                                        serials.getSerials(),
-                                                                                        actors.getActors(),
+                                            listOfActorsToListOfString(commandUser.searchAverageActors(movies,
+                                                                                        serials,
+                                                                                        actors,
                                                                                         numberOfActors,
                                                                                         sortType), numberOfActors);
                                 }
@@ -308,10 +312,6 @@ public final class Main {
                             String commandCriteria = currentCommand.getCriteria();
 
                             List<String> genresInput = currentCommand.getFilters().get(1);
-
-//                            int numberInput = currentCommand.getNumber();
-
-//                            User commandUser = new User();
 
                             switch (commandCriteria) {
                                 case "ratings" -> {
@@ -445,13 +445,7 @@ public final class Main {
                         case "shows" -> {
                             String commandCriteria = currentCommand.getCriteria();
 
-//                            String sortType = currentCommand.getSortType();
-
                             List<String> genresInput = currentCommand.getFilters().get(1);
-
-//                            int numberInput = currentCommand.getNumber();
-
-//                            User commandUser = new User();
 
                             ArrayList<String> result = null;
 
@@ -554,12 +548,20 @@ public final class Main {
                                     result = commandUser.recommendationStandard(userIterator,
                                                                                 movies,
                                                                                 serials);
+
+                                    break;
                                 }
                             }
 
-                            output = fileWriter.writeFile(actionId,
-                                    null,
-                                    "StandardRecommendation result: " + result);
+                            if (result.equals("cannot be applied!"))
+                                output = fileWriter.writeFile(actionId,
+                                        null,
+                                        "StandardRecommendation " + result);
+
+                            else
+                                output = fileWriter.writeFile(actionId,
+                                        null,
+                                        "StandardRecommendation result: " + result);
 
                             arrayResult.add(output);
 
@@ -572,12 +574,20 @@ public final class Main {
                                     result = commandUser.recommendationBestUnseen(userIterator,
                                             movies,
                                             serials);
+
+                                    break;
                                 }
                             }
 
-                            output = fileWriter.writeFile(actionId,
-                                    null,
-                                    "BestRatedUnseenRecommendation result: " + result);
+                            if (result.equals("cannot be applied!"))
+                                output = fileWriter.writeFile(actionId,
+                                        null,
+                                        "BestRatedUnseenRecommendation " + result);
+
+                            else
+                                output = fileWriter.writeFile(actionId,
+                                        null,
+                                        "BestRatedUnseenRecommendation result: " + result);
 
                             arrayResult.add(output);
                         }
@@ -606,10 +616,15 @@ public final class Main {
                                                                         users,
                                                                         movies,
                                                                         serials);
+                            if (result.equals("cannot be applied!"))
+                                output = fileWriter.writeFile(actionId,
+                                        null,
+                                        "FavoriteRecommendation " + result);
 
-                            output = fileWriter.writeFile(actionId,
-                                    null,
-                                    "FavoriteRecommendation result: " + result);
+                            else
+                                output = fileWriter.writeFile(actionId,
+                                        null,
+                                        "FavoriteRecommendation result: " + result);
 
                             arrayResult.add(output);
                         }

@@ -1,6 +1,10 @@
 package entities;
 
+import java.awt.image.VolatileImage;
+import java.rmi.MarshalledObject;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import actions.*;
@@ -137,14 +141,14 @@ public class User implements Command, Query, Suggestions {
         ArrayList<User> newDataBase = new ArrayList<>();
 
         for (User iterator : dataBase) {
-            if ((iterator.getRatingMovieList().size() > 0) || (iterator.getRatingSeasonList().size() > 0))
+            if (iterator.getNumberOfRatings() > 0)
                 newDataBase.add(iterator);
         }
 
         if (sortType.equals("asc"))
-            newDataBase.sort(Comparator.comparing(User::getNumberOfRatings));
+            newDataBase.sort(Comparator.comparing(User::getNumberOfRatings).thenComparing(User::getUsername));
         if (sortType.equals("desc"))
-            newDataBase.sort(Comparator.comparing(User::getNumberOfRatings).reversed());
+            newDataBase.sort(Comparator.comparing(User::getNumberOfRatings).thenComparing(User::getUsername).reversed());
 
         ArrayList<User> firstNUsers = new ArrayList<>();
 
@@ -156,6 +160,19 @@ public class User implements Command, Query, Suggestions {
         }
 
         return firstNUsers;
+    }
+
+    public ArrayList<String> listOfVideoToListOfString(ArrayList<Video> videos, int n) {
+        ArrayList<String> result = new ArrayList<>();
+
+        if (n > videos.size())
+            n = videos.size();
+
+        for (int i = 0; i < n; i++) {
+            result.add(videos.get(i).getTitle());
+        }
+
+        return result;
     }
 
     public ArrayList<String> listOfMovieToListOfString(ArrayList<Movie> movies, int n) {
@@ -243,63 +260,39 @@ public class User implements Command, Query, Suggestions {
     }
 
 
-    public ArrayList<Actor> searchAverageActors(ArrayList<User> userDataBase,
-                                                 ArrayList<Movie> moviesDataBase,
-                                                 ArrayList<Serial> serialsDataBase,
-                                                 ArrayList<Actor> actorsDataBase,
+    public ArrayList<Actor> searchAverageActors(MovieDataBase movies,
+                                                 SerialDataBase serials,
+                                                 ActorDataBase actors,
                                                  int n,
                                                  String sortType) {
 
-
-        // for each actor
-        for (int i = 0; i < actorsDataBase.size(); i++) {
-            Double ratingSum = 0d;
-
-            Double ratingsDifferentFromZero = 0d;
-            // we calculate the rating
-            // we take every video he is in
-            ArrayList<String> actorVideos = actorsDataBase.get(i).getFilmography();
-
-            for (String actorVideosIterator : actorVideos) {
-                // we take every movie from the data base
-                for (Movie movieDataBaseIterator : moviesDataBase) {
-                    if (movieDataBaseIterator.getTitle().equals(actorVideosIterator)) {
-                        // add the ratings
-                        Double movieRating = movieDataBaseIterator.calculateRating();
-                        ratingSum = Double.valueOf(ratingSum.sum(ratingSum, movieRating));
-
-                        if (!(Double.compare(movieRating, 0.0) == 0))
-                            ratingsDifferentFromZero++;
-                    }
-                }
-
-                // every serial he is in
-                for (Serial serialDataBaseIterator : serialsDataBase) {
-                    if (serialDataBaseIterator.getTitle().equals(actorVideosIterator)) {
-                        // add the ratings
-                        Double serialRating = serialDataBaseIterator.calculateRating();
-                        ratingSum = Double.valueOf(ratingSum.sum(ratingSum, serialRating));
-                        if (!(Double.compare(serialRating, 0.0) == 0))
-                            ratingsDifferentFromZero++;
-                    }
-                }
-            }
-
-            actorsDataBase.get(i).setRating(Double.valueOf(ratingSum / ratingsDifferentFromZero));
-        }
-
         ArrayList<Actor> actorsNenul = new ArrayList<>();
 
-        for (int i = 0; i < actorsDataBase.size(); i++) {
-            if (Double.compare(actorsDataBase.get(i).getRating(), Double.valueOf(0.0)) > 0)
-                actorsNenul.add(actorsDataBase.get(i));
+        // for each actor
+        for (Actor actor : actors.getActors()) {
+            double actorRating = actor.calculateRating(movies, serials);
+            if (Double.compare(actorRating, 0d) > 0)
+                actorsNenul.add(actor);
         }
 
         if (sortType.equals("asc"))
-            actorsNenul.sort(Comparator.comparing(Actor::getRating).thenComparing(Actor::getName));
+            actorsNenul.sort(Comparator.comparing((actor) -> ((Actor)actor).calculateRating(movies, serials))
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return ((Actor)o1).getName().compareTo(((Actor)o2).getName());
+                        }
+                    }));
 
         if (sortType.equals("desc"))
-            actorsNenul.sort(Comparator.comparing(Actor::getRating).thenComparing(Actor::getName).reversed());
+            actorsNenul.sort(Comparator.comparing((actor) -> ((Actor)actor).calculateRating(movies, serials))
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return ((Actor)o1).getName().compareTo(((Actor)o2).getName());
+                        }
+                    })
+                    .reversed());
 
         return actorsNenul;
     }
@@ -334,21 +327,26 @@ public class User implements Command, Query, Suggestions {
 
     @Override
     public ArrayList<Actor> searchActorsByFilterDescription(ActorDataBase actors, List<String> words, String sortType) {
-        ArrayList<Actor> actorsList = actors.getActors();
-
         ArrayList<Actor> newActorsDataBase = new ArrayList<>();
 
-
-
-        for (Actor actorIterator : actorsList) {
+        for (Actor actorIterator : actors.getActors()) {
             boolean check = true;
 
             for (String wordIterator : words) {
-                if (!actorIterator.getCareerDescription().contains(wordIterator)) {
-                    check = false;
+                Pattern pattern = Pattern.compile("[^a-z]" +  wordIterator + "[^a-z]", Pattern.CASE_INSENSITIVE);
+                Matcher matcher = pattern.matcher(actorIterator.getCareerDescription());
+                boolean matchFound = matcher.find();
 
+                if (!matchFound) {
+                    check = false;
                     break;
                 }
+
+//                if (!actorIterator.getCareerDescription().toLowerCase().contains(" " + wordIterator.toLowerCase() + " ")) {
+//                    check = false;
+//
+//                    break;
+//                }
             }
 
             if (check) {
@@ -422,11 +420,25 @@ public class User implements Command, Query, Suggestions {
                 movies.add(movieIterator);
         }
 
+        // IT WORKS NOW!!!!!
+
         if (sortType.equals("asc"))
-            movies.sort(Comparator.comparing((movie) -> new Movie().getNumberOfFavorites(usersDataBase.getUsers())));
+            movies.sort(Comparator.comparing((movie) -> ((Movie)movie).getNumberOfFavorites(usersDataBase.getUsers()))
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return ((Movie)o1).getTitle().compareTo(((Movie)o2).getTitle());
+                        }
+                    }));
 
         if (sortType.equals("desc"))
-            movies.sort(Comparator.comparing((movie) -> new Movie().getNumberOfFavorites(usersDataBase.getUsers())).reversed());
+            movies.sort(Comparator.comparing((movie) -> ((Movie)movie).getNumberOfFavorites(usersDataBase.getUsers()))
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Movie)o1).getTitle()).compareTo(((Movie)o2).getTitle());
+                        }
+                    }).reversed());
 
         return movies;
     }
@@ -447,10 +459,22 @@ public class User implements Command, Query, Suggestions {
         }
 
         if (sortType.equals("asc"))
-            serials.sort(Comparator.comparing((serial) -> new Serial().getNumberOfFavorites(usersDataBase.getUsers())));
+            serials.sort(Comparator.comparing((serial) -> ((Serial)serial).getNumberOfFavorites(usersDataBase.getUsers()))
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Serial)o1).getTitle()).compareTo(((Serial)o2).getTitle());
+                        }
+                    }));
 
         if (sortType.equals("desc"))
-            serials.sort(Comparator.comparing((serial) -> new Serial().getNumberOfFavorites(usersDataBase.getUsers())).reversed());
+            serials.sort(Comparator.comparing((serial) -> ((Serial)serial).getNumberOfFavorites(usersDataBase.getUsers()))
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Serial)o1).getTitle()).compareTo(((Serial)o2).getTitle());
+                        }
+                    }).reversed());
 
         return serials;
     }
@@ -469,10 +493,23 @@ public class User implements Command, Query, Suggestions {
         }
 
         if (sortType.equals("asc"))
-            movies.sort(Comparator.comparing(Movie::getDuration));
+            movies.sort(Comparator.comparing(Movie::getDuration)
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Movie)o1).getTitle()).compareTo(((Movie)o2).getTitle());
+                        }
+                    }));
 
         if (sortType.equals("desc"))
-            movies.sort(Comparator.comparing(Movie::getDuration).reversed());
+            movies.sort(Comparator.comparing(Movie::getDuration)
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Movie)o1).getTitle()).compareTo(((Movie)o2).getTitle());
+                        }
+                    })
+                    .reversed());
 
         return movies;
     }
@@ -492,10 +529,23 @@ public class User implements Command, Query, Suggestions {
         }
 
         if (sortType.equals("asc"))
-            serials.sort(Comparator.comparing(Serial::getDuration));
+            serials.sort(Comparator.comparing(Serial::getDuration)
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Serial)o1).getTitle()).compareTo(((Serial)o2).getTitle());
+                        }
+                    }));
 
         if (sortType.equals("desc")) {
-            serials.sort(Comparator.comparing(Serial::getDuration).reversed());
+            serials.sort(Comparator.comparing(Serial::getDuration)
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Serial)o1).getTitle()).compareTo(((Serial)o2).getTitle());
+                        }
+                    })
+                    .reversed());
         }
 
         return serials;
@@ -517,10 +567,23 @@ public class User implements Command, Query, Suggestions {
         }
 
         if (sortType.equals("asc"))
-            movies.sort(Comparator.comparing((movie) -> new Movie().getNumberOfViews(usersDataBase)));
+            movies.sort(Comparator.comparing((movie) -> ((Movie)movie).getNumberOfViews(usersDataBase))
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Movie)o1).getTitle()).compareTo(((Movie)o2).getTitle());
+                        }
+                    }));
 
         if (sortType.equals("desc"))
-            movies.sort(Comparator.comparing((movie) -> new Movie().getNumberOfViews(usersDataBase)).reversed());
+            movies.sort(Comparator.comparing((movie) -> ((Movie)movie).getNumberOfViews(usersDataBase))
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Movie)o1).getTitle()).compareTo(((Movie)o2).getTitle());
+                        }
+                    })
+                    .reversed());
 
         return movies;
     }
@@ -541,10 +604,23 @@ public class User implements Command, Query, Suggestions {
         }
 
         if (sortType.equals("asc"))
-            serials.sort(Comparator.comparing((serial) -> new Serial().getNumberOfViews(usersDataBase)));
+            serials.sort(Comparator.comparing((serial) -> ((Serial)serial).getNumberOfViews(usersDataBase))
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Serial)o1).getTitle()).compareTo(((Serial)o2).getTitle());
+                        }
+                    }));
 
         if (sortType.equals("desc"))
-            serials.sort(Comparator.comparing((serial) -> new Serial().getNumberOfViews(usersDataBase)).reversed());
+            serials.sort(Comparator.comparing((serial) -> ((Serial)serial).getNumberOfViews(usersDataBase))
+                    .thenComparing(new Comparator<Object>() {
+                        @Override
+                        public int compare(Object o1, Object o2) {
+                            return (((Serial)o1).getTitle()).compareTo(((Serial)o2).getTitle());
+                        }
+                    })
+                    .reversed());
 
         return serials;
     }
@@ -561,33 +637,37 @@ public class User implements Command, Query, Suggestions {
                 return serialIterator.getTitle();
         }
 
-        return null;
+        return "cannot be applied!";
     }
 
     @Override
     public String recommendationBestUnseen(User user, MovieDataBase movies, SerialDataBase serials) {
-        // create the video data base first
-        ArrayList<Movie> movieRatingDataBase = movies.getMovies();
+        // group all the videos
+        ArrayList<Video> videos = new ArrayList<>();
 
-        movieRatingDataBase.sort(Comparator.comparing(Movie::calculateRating));
+        videos.addAll(movies.getMovies());
 
-        ArrayList<Serial> serialRatingDataBase = serials.getSerials();
+        videos.addAll(serials.getSerials());
 
-        serialRatingDataBase.sort(Comparator.comparing(Serial::calculateRating));
+        // sort by the rating, in descending way
+        videos.sort(Comparator.comparing((video) -> {
+            double n = 0d;
+            if (video instanceof Movie)
+                n = ((Movie)video).calculateRating();
 
-        String result = null;
+            if (video instanceof Serial)
+                n = ((Serial)video).calculateRating();
 
-        for (Movie movieIterator : movieRatingDataBase) {
-            if (!user.getHistory().containsKey(movieIterator.getTitle()))
-                return movieIterator.getTitle();
-        }
+            return n;
+        }).reversed());
 
-        for (Serial serialIterator : serialRatingDataBase) {
-            if (!user.getHistory().containsKey(serialIterator.getTitle()))
-                return serialIterator.getTitle();
-        }
+        // iterate through the videos until we find one that's unseen by the user
+        for (Video videoIterator : videos)
+            if (!user.getHistory().containsKey(videoIterator.getTitle()))
+                return videoIterator.getTitle();
 
-        return result;
+        // if we didn't find any video, return error message
+        return "cannot be applied!";
     }
 
     public ArrayList<Genre> calculateTopGenres(UserDataBase users,
@@ -668,64 +748,65 @@ public class User implements Command, Query, Suggestions {
 
     @Override
     public String recommendationFavorite(String username, UserDataBase users, MovieDataBase movies, SerialDataBase serials) {
-        ArrayList<Movie> movieFavoriteDataBase = movies.getMovies();
+        ArrayList<Video> videos = new ArrayList<>();
 
-        // might not need to all the movies, one with no favorites mabye should not be included
-        movieFavoriteDataBase.sort(Comparator.comparing((movie) -> new Movie().getNumberOfFavorites(users.getUsers())).reversed());
+        videos.addAll(movies.getMovies());
+        videos.addAll(serials.getSerials());
 
-        ArrayList<Serial> serialFavoriteDataBase = serials.getSerials();
+        videos.sort(Comparator.comparing((video) -> {
+            int n = 0;
+            if (video instanceof Movie)
+                n = ((Movie)video).getNumberOfFavorites(users.getUsers());
+            if (video instanceof Serial)
+                n = ((Serial)video).getNumberOfFavorites(users.getUsers());
 
-        serialFavoriteDataBase.sort(Comparator.comparing((serial) -> new Serial().getNumberOfFavorites(users.getUsers())).reversed());
+            return n;
+        }).reversed());
 
         for (User userIterator : users.getUsers()) {
             if (userIterator.getUsername().equals(username) &&
                     userIterator.getSubscriptionType().equals("PREMIUM")) {
-                for (Movie movieIterator : movieFavoriteDataBase) {
-                    if (!userIterator.getFavoriteMovies().contains(movieIterator.getTitle()))
-                        return movieIterator.getTitle();
-                }
-
-                for (Serial serialIterator : serialFavoriteDataBase) {
-                    if (!userIterator.getFavoriteMovies().contains(serialIterator.getTitle()))
-                        return serialIterator.getTitle();
-                }
+                for (Video videoIterator : videos)
+                    if (!userIterator.getHistory().containsKey(videoIterator.getTitle()))
+                        return videoIterator.getTitle();
             }
         }
 
-        return null;
+        return "cannot be applied!";
     }
 
     @Override
-    public ArrayList<String> recommendationSearch(String userName, UserDataBase users, MovieDataBase movies, SerialDataBase serials, String genre) {
+    public ArrayList<String> recommendationSearch(String userName,
+                                                  UserDataBase users,
+                                                  MovieDataBase movies,
+                                                  SerialDataBase serials,
+                                                  String genre) {
         for (User userIterator : users.getUsers()) {
             if (userIterator.getUsername().equals(userName)) {
-                ArrayList<Movie> moviesByGenre = new ArrayList<>();
+                ArrayList<Video> result = new ArrayList<>();
 
                 for (Movie movieIterator : movies.getMovies())
-                    if (movieIterator.getGenres().contains(Utils.stringToGenre(genre)))
-                        moviesByGenre.add(movieIterator);
-
-                ArrayList<Serial> serialByGenre = new ArrayList<>();
+                    if (movieIterator.getGenres().contains(Utils.stringToGenre(genre)) &&
+                            !userIterator.getHistory().containsKey(movieIterator.getTitle()))
+                        result.add(movieIterator);
 
                 for (Serial serialIterator : serials.getSerials())
-                    if (serialIterator.getGenres().contains(Utils.stringToGenre(genre)))
-                        serialByGenre.add(serialIterator);
+                    if (serialIterator.getGenres().contains(Utils.stringToGenre(genre)) &&
+                            !userIterator.getHistory().containsKey(serialIterator.getTitle()))
+                        result.add(serialIterator);
 
-                moviesByGenre.sort(Comparator.comparing(Movie::calculateRating).thenComparing(Movie::getTitle));
+                result.sort(Comparator.comparing((v) -> {
+                    double n = 0d;
+                    if (v instanceof Movie)
+                         n = ((Movie)v).calculateRating();
+                    else
+                        n = ((Serial)v).calculateRating();
 
-                serialByGenre.sort(Comparator.comparing(Serial::calculateRating).thenComparing(Serial::getTitle));
+                    return n;
+                })
+                        .thenComparing((v) -> ((Video)v).getTitle()));
 
-                ArrayList<String> result = new ArrayList<>();
-
-                for (Movie movieIterator : moviesByGenre)
-                    if (!userIterator.getHistory().containsKey(movieIterator.getTitle()))
-                        result.add(movieIterator.getTitle());
-
-                for (Serial serialIterator : serialByGenre)
-                    if (!userIterator.getHistory().containsKey(serialIterator.getTitle()))
-                        result.add(serialIterator.getTitle());
-
-                return result;
+                return listOfVideoToListOfString(result, result.size());
             }
         }
 
