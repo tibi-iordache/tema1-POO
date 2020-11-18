@@ -13,20 +13,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface Query {
-    ArrayList<User> searchUsersByNumberOfRatings(ArrayList<User> dataBase, int n);
+    ArrayList<User> searchUsersByNumberOfRatings(ArrayList<User> dataBase,
+                                                 int n,
+                                                 String sortType);
 
-    ArrayList<String> searchAverageActors(ArrayList<User> userDataBase,
+    ArrayList<Actor> searchAverageActors(ArrayList<User> userDataBase,
                                           ArrayList<Movie> moviesDataBase,
                                           ArrayList<Serial> serialsDataBase,
                                           ArrayList<Actor> actorsDataBase,
                                           int n,
                                           String sortType);
 
-    ArrayList<String> searchActorsByAwards(ArrayList<Actor> actorsDataBase,
+    ArrayList<Actor> searchActorsByAwards(ArrayList<Actor> actorsDataBase,
                                            List<String> awardsSearched,
                                            String sortType);
 
-    ArrayList<String> searchActorsByFilterDescription(ActorDataBase actors,
+    ArrayList<Actor> searchActorsByFilterDescription(ActorDataBase actors,
                                                       List<String> words,
                                                       String sortType);
 

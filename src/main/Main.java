@@ -114,6 +114,8 @@ public final class Main {
 
             String videoName = currentCommand.getTitle();
 
+            String sortType =currentCommand.getSortType();
+
             JSONObject output;
 
             switch (actionType) {
@@ -215,10 +217,16 @@ public final class Main {
                 }
                 case QUERY -> {
                     String objectType = currentCommand.getObjectType();
+
+                    int numberInput = input.getCommands().get(i).getNumber();
+
+                    User commandUser = new User();
+
                     switch (objectType) {
                         case "users" -> {
-                            ArrayList<User> result = users.getUsers().get(0).searchUsersByNumberOfRatings(users.getUsers(),
-                                    input.getCommands().get(i).getNumber());
+                            ArrayList<User> result = commandUser.searchUsersByNumberOfRatings(users.getUsers(),
+                                                                                                numberInput,
+                                                                                                sortType);
 
                             StringBuilder builder = new StringBuilder();
 
@@ -239,94 +247,71 @@ public final class Main {
                         case "actors" -> {
                             String commandCriteria = currentCommand.getCriteria();
 
-                            String sortType = currentCommand.getSortType();
-
-                            User commandUser = new User();
+                            ArrayList<String> result = null;
 
                             switch (commandCriteria) {
                                 case "average" -> {
                                     int numberOfActors = currentCommand.getNumber();
 
-                                    ArrayList<String> firstNActors = commandUser.searchAverageActors(users.getUsers(),
-                                            movies.getMovies(),
-                                            serials.getSerials(),
-                                            actors.getActors(),
-                                            numberOfActors,
-                                            sortType);
-
-                                    StringBuilder builder = new StringBuilder();
-
-                                    for (int k = 0; k < firstNActors.size(); k++) {
-                                        builder.append(firstNActors.get(k));
-
-                                        if (k != (firstNActors.size() - 1))
-                                            builder.append(", ");
-                                    }
-
-                                    output = fileWriter.writeFile(actionId,
-                                            null,
-                                            "Query result: [" + builder + "]");
-
-                                    arrayResult.add(output);
+                                    result = commandUser.
+                                            listOfActorsToListOfString(commandUser.searchAverageActors(users.getUsers(),
+                                                                                        movies.getMovies(),
+                                                                                        serials.getSerials(),
+                                                                                        actors.getActors(),
+                                                                                        numberOfActors,
+                                                                                        sortType), numberOfActors);
                                 }
 
                                 case "awards" -> {
                                     List<String> awardsToBeSearchedBy = currentCommand.getFilters().get(3);
 
-                                    ArrayList<String> result = commandUser.searchActorsByAwards(actors.getActors(),
+                                    ArrayList<Actor> actorAwardsResult = commandUser.
+                                            searchActorsByAwards(actors.getActors(),
                                             awardsToBeSearchedBy,
                                             sortType);
 
-                                    StringBuilder builder = new StringBuilder();
-
-                                    for (int k = 0; k < result.size(); k++) {
-                                        builder.append(result.get(k));
-
-                                        if (k != (result.size() - 1))
-                                            builder.append(", ");
-                                    }
-
-                                    output = fileWriter.writeFile(actionId,
-                                            null,
-                                            "Query result: [" + builder + "]");
-
-                                    arrayResult.add(output);
+                                    result = commandUser.listOfActorsToListOfString(actorAwardsResult,
+                                            actorAwardsResult.size());
                                 }
 
                                 case "filter_description" -> {
                                     List<String> wordsToBeSearched = currentCommand.getFilters().get(2);
 
-                                    ArrayList<String> result = commandUser.searchActorsByFilterDescription(actors,
-                                                                                                wordsToBeSearched,
-                                                                                                sortType);
+                                    ArrayList<Actor> actorsFilterResult = commandUser.
+                                            searchActorsByFilterDescription(actors,
+                                            wordsToBeSearched,
+                                            sortType);
 
-                                    StringBuilder builder = new StringBuilder();
+                                    result = commandUser.listOfActorsToListOfString(actorsFilterResult,
+                                                                                    actorsFilterResult.size());
 
-                                    for (int k = 0; k < result.size(); k++) {
-                                        builder.append(result.get(k));
-
-                                        if (k != (result.size() - 1))
-                                            builder.append(", ");
-                                    }
-
-                                    output = fileWriter.writeFile(actionId,
-                                            null,
-                                            "Query result: [" + builder + "]");
-
-                                    arrayResult.add(output);
                                 }
                             }
+
+                            StringBuilder builder = new StringBuilder();
+
+                            for (int k = 0; k < result.size(); k++) {
+                                builder.append(result.get(k));
+
+                                if (k != (result.size() - 1))
+                                    builder.append(", ");
+                            }
+
+                            output = fileWriter.writeFile(actionId,
+                                    null,
+                                    "Query result: [" + builder + "]");
+
+                            arrayResult.add(output);
                         }
+
                         case "movies" -> {
                             String commandCriteria = currentCommand.getCriteria();
 
-                            String sortType = currentCommand.getSortType();
-
                             List<String> genresInput = currentCommand.getFilters().get(1);
 
-                            int numberInput = currentCommand.getNumber();
+//                            int numberInput = currentCommand.getNumber();
 
-                            User commandUser = new User();
+//                            User commandUser = new User();
 
                             switch (commandCriteria) {
                                 case "ratings" -> {
@@ -460,13 +445,15 @@ public final class Main {
                         case "shows" -> {
                             String commandCriteria = currentCommand.getCriteria();
 
-                            String sortType = currentCommand.getSortType();
+//                            String sortType = currentCommand.getSortType();
 
                             List<String> genresInput = currentCommand.getFilters().get(1);
 
-                            int numberInput = currentCommand.getNumber();
+//                            int numberInput = currentCommand.getNumber();
 
-                            User commandUser = new User();
+//                            User commandUser = new User();
+
+                            ArrayList<String> result = null;
 
                             switch (commandCriteria) {
                                 case "ratings" -> {
@@ -476,27 +463,12 @@ public final class Main {
                                         yearInput = Integer.parseInt(currentCommand.getFilters().get(0).get(0));
                                     }
 
-                                    ArrayList<String> result = commandUser.listOfSerialToListOfString(commandUser.
+                                    result = commandUser.listOfSerialToListOfString(commandUser.
                                             searchSerialsByRating(serials,
                                                     yearInput,
                                                     genresInput,
                                                     numberInput,
                                                     sortType), numberInput);
-
-                                    StringBuilder builder = new StringBuilder();
-
-                                    for (int k = 0; k < result.size(); k++) {
-                                        builder.append(result.get(k));
-
-                                        if (k != (result.size() - 1))
-                                            builder.append(", ");
-                                    }
-
-                                    output = fileWriter.writeFile(actionId,
-                                            null,
-                                            "Query result: [" + builder + "]");
-
-                                    arrayResult.add(output);
                                 }
 
                                 case "favorite" -> {
@@ -506,28 +478,13 @@ public final class Main {
                                         yearInput = Integer.parseInt(currentCommand.getFilters().get(0).get(0));
                                     }
 
-                                    ArrayList<String> result = commandUser.listOfSerialToListOfString(commandUser.
+                                    result = commandUser.listOfSerialToListOfString(commandUser.
                                             searchSerialsByFavorite(serials,
                                                     users,
                                                     yearInput,
                                                     genresInput,
                                                     numberInput,
                                                     sortType), numberInput);
-
-                                    StringBuilder builder = new StringBuilder();
-
-                                    for (int k = 0; k < result.size(); k++) {
-                                        builder.append(result.get(k));
-
-                                        if (k != (result.size() - 1))
-                                            builder.append(", ");
-                                    }
-
-                                    output = fileWriter.writeFile(actionId,
-                                            null,
-                                            "Query result: [" + builder + "]");
-
-                                    arrayResult.add(output);
                                 }
 
                                 case "longest" -> {
@@ -537,27 +494,12 @@ public final class Main {
                                         yearInput = Integer.parseInt(currentCommand.getFilters().get(0).get(0));
                                     }
 
-                                    ArrayList<String> result = commandUser.listOfSerialToListOfString(commandUser.
+                                    result = commandUser.listOfSerialToListOfString(commandUser.
                                             searchSerialsByDuration(serials,
                                                     yearInput,
                                                     genresInput,
                                                     numberInput,
                                                     sortType), numberInput);
-
-                                    StringBuilder builder = new StringBuilder();
-
-                                    for (int k = 0; k < result.size(); k++) {
-                                        builder.append(result.get(k));
-
-                                        if (k != (result.size() - 1))
-                                            builder.append(", ");
-                                    }
-
-                                    output = fileWriter.writeFile(actionId,
-                                            null,
-                                            "Query result: [" + builder + "]");
-
-                                    arrayResult.add(output);
                                 }
 
                                 case "most_viewed" -> {
@@ -567,30 +509,140 @@ public final class Main {
                                         yearInput = Integer.parseInt(currentCommand.getFilters().get(0).get(0));
                                     }
 
-                                    ArrayList<String> result = commandUser.listOfSerialToListOfString(commandUser.
+                                    result = commandUser.listOfSerialToListOfString(commandUser.
                                             searchSerialsByViews(serials,
                                             users,
                                             yearInput,
                                             genresInput,
                                             numberInput,
                                             sortType), numberInput);
-
-                                    StringBuilder builder = new StringBuilder();
-
-                                    for (int k = 0; k < result.size(); k++) {
-                                        builder.append(result.get(k));
-
-                                        if (k != (result.size() - 1))
-                                            builder.append(", ");
-                                    }
-
-                                    output = fileWriter.writeFile(actionId,
-                                            null,
-                                            "Query result: [" + builder + "]");
-
-                                    arrayResult.add(output);
                                 }
                             }
+
+                            StringBuilder builder = new StringBuilder();
+
+                            for (int k = 0; k < result.size(); k++) {
+                                builder.append(result.get(k));
+
+                                if (k != (result.size() - 1))
+                                    builder.append(", ");
+                            }
+
+                            output = fileWriter.writeFile(actionId,
+                                    null,
+                                    "Query result: [" + builder + "]");
+
+                            arrayResult.add(output);
+                        }
+                    }
+                }
+
+                case RECOMMENDATION -> {
+                    String type = currentCommand.getType();
+
+                    User commandUser = new User();
+
+                    String userNameInput = currentCommand.getUsername();
+
+                    String result = null;
+
+                    switch (type) {
+                        case "standard" -> {
+
+                            for (User userIterator : users.getUsers()) {
+                                if (userIterator.getUsername().equals(userNameInput)) {
+                                    result = commandUser.recommendationStandard(userIterator,
+                                                                                movies,
+                                                                                serials);
+                                }
+                            }
+
+                            output = fileWriter.writeFile(actionId,
+                                    null,
+                                    "StandardRecommendation result: " + result);
+
+                            arrayResult.add(output);
+
+                        }
+
+                        case "best_unseen" -> {
+
+                            for (User userIterator : users.getUsers()) {
+                                if (userIterator.getUsername().equals(userNameInput)) {
+                                    result = commandUser.recommendationBestUnseen(userIterator,
+                                            movies,
+                                            serials);
+                                }
+                            }
+
+                            output = fileWriter.writeFile(actionId,
+                                    null,
+                                    "BestRatedUnseenRecommendation result: " + result);
+
+                            arrayResult.add(output);
+                        }
+
+                        case "popular" -> {
+                            result = commandUser.recommendationPopular(userNameInput,
+                                                                        users,
+                                                                        movies,
+                                                                        serials);
+                            if (result.equals("cannot be applied!")) {
+                                output = fileWriter.writeFile(actionId,
+                                        null,
+                                        "PopularRecommendation " + result);
+                            }
+                            else {
+                                output = fileWriter.writeFile(actionId,
+                                        null,
+                                        "PopularRecommendation result: " + result);
+                            }
+
+                            arrayResult.add(output);
+                        }
+
+                        case "favorite" -> {
+                            result = commandUser.recommendationFavorite(userNameInput,
+                                                                        users,
+                                                                        movies,
+                                                                        serials);
+
+                            output = fileWriter.writeFile(actionId,
+                                    null,
+                                    "FavoriteRecommendation result: " + result);
+
+                            arrayResult.add(output);
+                        }
+
+                        case "search" -> {
+                            String genre = currentCommand.getGenre();
+
+                            ArrayList<String> resultSearch = commandUser.recommendationSearch(userNameInput,
+                                    users,
+                                    movies,
+                                    serials,
+                                    genre);;
+                            if (resultSearch == null || resultSearch.size() == 0) {
+                                output = fileWriter.writeFile(actionId,
+                                        null,
+                                        "SearchRecommendation cannot be applied!");
+                            }
+                            else {
+                                StringBuilder builder = new StringBuilder();
+
+                                for (int k = 0; k < resultSearch.size(); k++) {
+                                    builder.append(resultSearch.get(k));
+
+                                    if (k != (resultSearch.size() - 1))
+                                        builder.append(", ");
+                                }
+
+                                output = fileWriter.writeFile(actionId,
+                                        null,
+                                        "SearchRecommendation result: [" + builder + "]");
+                            }
+
+                            arrayResult.add(output);
                         }
                     }
                 }

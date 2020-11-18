@@ -45,10 +45,10 @@ public class Movie extends Video {
         return 0d;
     }
 
-    public int getNumberOfFavorites(UserDataBase usersDataBase) {
+    public int getNumberOfFavorites(ArrayList<User> users) {
         int number = 0;
 
-        for(User userIterator : usersDataBase.getUsers()) {
+        for(User userIterator : users) {
             if (userIterator.getFavoriteMovies().contains(this.getTitle()))
                 number++;
         }
