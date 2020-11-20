@@ -2,18 +2,18 @@ package databases;
 
 import entertainment.Genre;
 import entertainment.Season;
-import entities.Serial;
-import entities.SerialSeason;
+import entertainment.Serial;
+import entertainment.SerialSeason;
 import fileio.SerialInputData;
 import utils.Utils;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class SerialDataBase {
-    private ArrayList<Serial> serials;
+public final class SerialDataBase {
+    private final ArrayList<Serial> serials;
 
-    public SerialDataBase(List<SerialInputData> serialsInput) {
+    public SerialDataBase(final List<SerialInputData> serialsInput) {
+        // create the serials list
         serials = new ArrayList<>();
 
         for (SerialInputData serialInputData : serialsInput) {
@@ -22,18 +22,21 @@ public class SerialDataBase {
 
             int seasonCounter = 1;
 
-            ArrayList<SerialSeason> serialSeasons = new ArrayList<>();
+            ArrayList<SerialSeason> serialSeasons = new ArrayList<SerialSeason>();
 
             for (Season season : serialsInputSeasons) {
                 serialSeasons.add(new SerialSeason(season.getDuration(),
-                        seasonCounter++));
+                                                        seasonCounter++));
             }
 
-            ArrayList<Genre> genres = new ArrayList<>();
+            // create the serial genre list
+            ArrayList<Genre> genres = new ArrayList<Genre>();
 
-            for (int i = 0; i < serialInputData.getGenres().size(); i++)
+            for (int i = 0; i < serialInputData.getGenres().size(); i++) {
                 genres.add(Utils.stringToGenre(serialInputData.getGenres().get(i)));
+            }
 
+            // add the new serial to the list
             serials.add(new Serial(serialInputData.getTitle(),
                     serialInputData.getCast(),
                     genres,
@@ -47,14 +50,11 @@ public class SerialDataBase {
         return serials;
     }
 
-    public void setSerials(ArrayList<Serial> serials) {
-        this.serials = serials;
-    }
-
     @Override
     public String toString() {
-        return "SerialDataBase{" +
-                "serials=" + serials +
-                '}';
+        return "SerialDataBase{"
+                + "serials="
+                + serials
+                + '}';
     }
 }

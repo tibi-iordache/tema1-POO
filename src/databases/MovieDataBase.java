@@ -1,34 +1,34 @@
 package databases;
 
 import entertainment.Genre;
-import entities.Movie;
+import entertainment.Movie;
 import fileio.MovieInputData;
-import jdk.jshell.execution.Util;
 import utils.Utils;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class MovieDataBase {
-    private ArrayList<Movie> movies;
+public final class MovieDataBase {
+    private final ArrayList<Movie> movies;
 
-    public MovieDataBase(List<MovieInputData> moviesInput) {
+    public MovieDataBase(final List<MovieInputData> moviesInput) {
+        // create the movies list
         movies = new ArrayList<>();
 
-
-
+        // iterate through each input
         for (MovieInputData movieInputData : moviesInput) {
-            ArrayList<Genre> genres = new ArrayList<>();
+            // fist create the movie genre list
+            ArrayList<Genre> genres = new ArrayList<Genre>();
 
-            for (int i = 0; i < movieInputData.getGenres().size(); i++)
+            for (int i = 0; i < movieInputData.getGenres().size(); i++) {
                 genres.add(Utils.stringToGenre(movieInputData.getGenres().get(i)));
+            }
 
+            // add the new movie to the list
             movies.add(new Movie(movieInputData.getTitle(),
-                    movieInputData.getCast(),
-                    genres,
-                    movieInputData.getYear(),
-                    movieInputData.getDuration()));
+                        movieInputData.getCast(),
+                        genres,
+                        movieInputData.getYear(),
+                        movieInputData.getDuration()));
         }
     }
 
@@ -36,14 +36,11 @@ public class MovieDataBase {
         return movies;
     }
 
-    public void setMovies(ArrayList<Movie> movies) {
-        this.movies = movies;
-    }
-
     @Override
     public String toString() {
-        return "MovieDataBase{" +
-                "movies=" + movies +
-                '}';
+        return "MovieDataBase{"
+                + "movies="
+                + movies
+                + '}';
     }
 }

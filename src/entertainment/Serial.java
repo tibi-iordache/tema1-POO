@@ -1,27 +1,25 @@
-package entities;
+package entertainment;
 
 import databases.UserDataBase;
-import entertainment.Genre;
-
 import java.util.ArrayList;
 
-public class Serial extends Video {
-    private int numberOfSeasons;
+public final class Serial extends Video {
+    private final int numberOfSeasons;
 
     private ArrayList<SerialSeason> seasons;
 
-    private Double finalRating;
-
     public Serial() {
+        numberOfSeasons = 0;
 
+        seasons = null;
     }
 
-    public Serial(String title,
-                  ArrayList<String> cast,
-                  ArrayList<Genre> genres,
-                  int numberOfSeasons,
-                  ArrayList<SerialSeason> seasons,
-                  int releaseYear) {
+    public Serial(final String title,
+                  final ArrayList<String> cast,
+                  final ArrayList<Genre> genres,
+                  final int numberOfSeasons,
+                  final ArrayList<SerialSeason> seasons,
+                  final int releaseYear) {
         super(title, releaseYear, cast, genres);
 
         this.numberOfSeasons = numberOfSeasons;
@@ -29,23 +27,30 @@ public class Serial extends Video {
         this.seasons = seasons;
     }
 
+    @Override
     public Double calculateRating() {
         Double ratingSum = 0d;
         Double ratingNo = Double.valueOf(numberOfSeasons);
 
+        // iterate through each season
         for (int i = 0; i < numberOfSeasons; i++) {
-            ratingSum = ratingSum.sum(ratingSum, seasons.get(i).calculateRating());
+            // add to the sum each season rating
+            ratingSum = Double.sum(ratingSum, seasons.get(i).calculateRating());
         }
 
-        if (ratingNo > 0)
-            return ratingSum / ratingNo;
-
-        return 0d;
+        // return the mean of the ratings
+        return ratingSum / ratingNo;
     }
 
+    /**
+     * Calculate the serial total duration
+     *
+     * @return Returns the serial duration
+     */
     public int getDuration() {
         int duration = 0;
 
+        // sum each season duration
         for (SerialSeason seasonIterator : seasons) {
             duration += seasonIterator.getDuration();
         }
@@ -53,22 +58,29 @@ public class Serial extends Video {
         return duration;
     }
 
-    public int getNumberOfFavorites(ArrayList<User> users) {
+    @Override
+    public int getNumberOfFavorites(final UserDataBase users) {
         int number = 0;
 
-        for(User userIterator : users) {
-            if (userIterator.getFavoriteMovies().contains(this.getTitle()))
+        // iterate through each user
+        for (User userIterator : users.getUsers()) {
+            if (userIterator.getFavoriteMovies().contains(this.getTitle())) {
+                // increment if the user has added the serial to the favorite list
                 number++;
+            }
         }
 
         return number;
     }
 
-    public int getNumberOfViews(UserDataBase userDataBase) {
+    @Override
+    public int getNumberOfViews(final UserDataBase userDataBase) {
         int number = 0;
 
+        // iterate through each user
         for (User userIterator : userDataBase.getUsers()) {
             if (userIterator.getHistory().containsKey(this.getTitle())) {
+                // if the user watched the serial, add the number of views
                 number += userIterator.getHistory().get(this.getTitle());
             }
         }
@@ -84,14 +96,6 @@ public class Serial extends Video {
         return seasons;
     }
 
-    public Double getFinalRating() {
-        return finalRating;
-    }
-
-    public void setFinalRating() {
-        this.finalRating = calculateRating();
-    }
-
     @Override
     public String toString() {
         return "Serial{" + "title = " + super.getTitle()
@@ -100,7 +104,6 @@ public class Serial extends Video {
                 + ", cast " + super.getCast()
                 + "numberOfSeasons=" + numberOfSeasons
                 + ", seasons=" + seasons
-                + ", rating=" + finalRating
                 + '}';
     }
 }

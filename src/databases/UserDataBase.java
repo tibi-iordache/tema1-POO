@@ -1,18 +1,20 @@
 package databases;
 
-import entities.User;
+import entertainment.User;
 import fileio.UserInputData;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDataBase {
-    private ArrayList<User> users;
+public final class UserDataBase {
+    private final ArrayList<User> users;
 
-    public UserDataBase(List<UserInputData> usersInput) {
-        users = new ArrayList<>();
+    public UserDataBase(final List<UserInputData> usersInput) {
+        // create the users list
+        users = new ArrayList<User>();
 
+        // iterate through each input
         for (UserInputData userInputData : usersInput) {
+            // add the new user to the list
             users.add(new User(userInputData.getUsername(),
                     userInputData.getSubscriptionType(),
                     userInputData.getHistory(),
@@ -24,14 +26,11 @@ public class UserDataBase {
         return users;
     }
 
-    public void setUsers(ArrayList<User> users) {
-        this.users = users;
-    }
-
     @Override
     public String toString() {
-        return "UserDataBase{" +
-                "users=" + users +
-                '}';
+        return "UserDataBase{"
+                + "users="
+                + users
+                + '}';
     }
 }

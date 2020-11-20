@@ -1,27 +1,30 @@
 package databases;
 
 import actor.ActorsAwards;
-import entities.Actor;
+import actor.Actor;
 import fileio.ActorInputData;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ActorDataBase {
-    private ArrayList<Actor> actors;
+public final class ActorDataBase {
+    private final ArrayList<Actor> actors;
 
-    public ActorDataBase(List<ActorInputData> actorsInput) {
-        actors = new ArrayList<>();
+    public ActorDataBase(final List<ActorInputData> actorsInput) {
+        //create the actors list
+        actors = new ArrayList<Actor>();
 
+        // iterate through each input
         for (ActorInputData actorInputData : actorsInput) {
+            // create the iterator award
             Map<ActorsAwards, Integer> awards = new HashMap<>(actorInputData.getAwards());
 
+            // add a new actor to the list
             actors.add(new Actor(actorInputData.getName(),
-                    actorInputData.getCareerDescription(),
-                    actorInputData.getFilmography(),
-                    awards));
+                        actorInputData.getCareerDescription(),
+                        actorInputData.getFilmography(),
+                        awards));
         }
     }
 
@@ -29,14 +32,11 @@ public class ActorDataBase {
         return actors;
     }
 
-    public void setActors(ArrayList<Actor> actors) {
-        this.actors = actors;
-    }
-
     @Override
     public String toString() {
-        return "ActorDataBase{" +
-                "actors=" + actors +
-                '}';
+        return "ActorDataBase{"
+                + "actors="
+                + actors
+                + '}';
     }
 }
