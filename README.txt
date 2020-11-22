@@ -67,10 +67,6 @@ Probleme:
     a imi putea permite sa folosesc expresii regex, astfel incat cuvantul cautat sa inceapa cu orice
     caracter in afara de cele din intervalul a-z.
 
-        In cadrul clasei Action am importat direct toate constantele din common.Constants. Cu toate
-    ca inteleg ca nu este recomandat sa fac asta in general, in cazul de fata am preferat sa o fac,
-    pentru a nu incarca inceputul fisierului cu toate importurile pentru constantele necesare.
-
         Legat de github, primele commit-uri sunt in mare doar teste deoarce am intampinat mici
     probleme pana am invatat sa folosesc intellij(ma refer prin a face commit si push direct din
     ide).
@@ -83,5 +79,5 @@ Probleme:
 Feedback:
 
         Overall, mi-a placut chiar foarte mult tema! Am invatat multe, iar limbajul java in sine mi
-    se pare mai usor de implementat si rezolvat bug-uri(de asemenea ide-ul a fost un mare ajutor in
-    cazul depanarii problemelor).
+    se pare mai usor de implementat si de rezolvat bug-uri(de asemenea ide-ul a fost un mare ajutor
+    in cazul depanarii problemelor).

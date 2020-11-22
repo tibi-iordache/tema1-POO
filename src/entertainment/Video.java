@@ -30,7 +30,6 @@ public class Video implements VideoActions {
         this.genres = genres;
     }
 
-    // for now, these methods would do nothing
     /**
      * Calculate the rating of a video by doing the mean of the ratings list.
      * For a movie class that will extend this class will calculate the mean of the ratings list.

@@ -17,7 +17,7 @@ public final class ActorDataBase {
 
         // iterate through each input
         for (ActorInputData actorInputData : actorsInput) {
-            // create the iterator award
+            // create the iterator awards map
             Map<ActorsAwards, Integer> awards = new HashMap<>(actorInputData.getAwards());
 
             // add a new actor to the list

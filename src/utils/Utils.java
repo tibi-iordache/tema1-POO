@@ -183,6 +183,7 @@ public final class Utils {
 
     /**
      * Converts an ArrayList of Actors to an ArrayList of Strings.
+     *
      * @param actors The initial list
      * @param listSize The size of the list
      * @return Returns an ArrayList of Strings with each actor name

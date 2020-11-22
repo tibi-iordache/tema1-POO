@@ -13,7 +13,38 @@ import fileio.SerialInputData;
 import fileio.UserInputData;
 import java.util.ArrayList;
 import java.util.List;
-import static common.Constants.*;
+
+import static common.Constants.SUCCESS;
+import static common.Constants.DUPLICATE;
+import static common.Constants.NOT_SEEN;
+import static common.Constants.ALREADY_RATED;
+import static common.Constants.USERS;
+import static common.Constants.ACTORS;
+import static common.Constants.MOVIES;
+import static common.Constants.SHOWS;
+import static common.Constants.AVERAGE;
+import static common.Constants.AWARDS;
+import static common.Constants.FILTER_DESCRIPTIONS;
+import static common.Constants.RATINGS;
+import static common.Constants.LONGEST;
+import static common.Constants.FAVORITE;
+import static common.Constants.MOST_VIEWED;
+import static common.Constants.STANDARD;
+import static common.Constants.CANNOT_BE_APPLIED;
+import static common.Constants.BEST_UNSEEN;
+import static common.Constants.POPULAR;
+import static common.Constants.SEARCH;
+import static common.Constants.FIRST_FILTER;
+import static common.Constants.SECOND_FILTER;
+import static common.Constants.THIRD_FILTER;
+import static common.Constants.FOURTH_FILTER;
+import static common.Constants.COMMAND;
+import static common.Constants.COMMAND_TYPE_FAVORITE;
+import static common.Constants.COMMAND_TYPE_RATING;
+import static common.Constants.COMMAND_TYPE_VIEW;
+import static common.Constants.QUERY;
+import static common.Constants.RECOMMENDATION;
+
 
 public final class Action {
     private final UserDataBase users;
@@ -316,11 +347,11 @@ public final class Action {
     public ArrayList<String> doQueryUsers(final int number,
                                           final String sortType) {
         // dummy user used only for method call
-        User commandUser = new User();
+        User dummyUser = new User();
 
-        ArrayList<User> listOfUsers = commandUser.searchUsersByNumberOfRatings(users,
-                                                                               number,
-                                                                               sortType);
+        ArrayList<User> listOfUsers = dummyUser.searchUsersByNumberOfRatings(users,
+                                                                             number,
+                                                                             sortType);
 
         return Utils.listOfUsersToListOfString(listOfUsers, number);
     }
@@ -341,7 +372,7 @@ public final class Action {
                                            final List<String> filterWords,
                                            final List<String> filterAwards) {
         // dummy user used only for method call
-        User commandUser = new User();
+        User dummyUser = new User();
 
         // search actors depending on criteria
         switch (criteria) {
@@ -350,7 +381,7 @@ public final class Action {
             }
 
             case AVERAGE -> {
-                return Utils.listOfActorsToListOfString(commandUser
+                return Utils.listOfActorsToListOfString(dummyUser
                                                         .searchAverageActors(movies,
                                                                              serials,
                                                                              actors,
@@ -358,14 +389,14 @@ public final class Action {
             }
 
             case AWARDS -> {
-                return Utils.listOfActorsToListOfString(commandUser
+                return Utils.listOfActorsToListOfString(dummyUser
                                                         .searchActorsByAwards(actors,
                                                                               filterAwards,
                                                                               sortType), number);
             }
 
             case FILTER_DESCRIPTIONS -> {
-                return Utils.listOfActorsToListOfString(commandUser
+                return Utils.listOfActorsToListOfString(dummyUser
                             .searchActorsByFilterDescription(actors,
                                                              filterWords,
                                                              sortType), number);
@@ -389,7 +420,7 @@ public final class Action {
                                            final int filterYear,
                                            final List<String> filterGenres) {
         // dummy user used only for method call
-        User commandUser = new User();
+        User dummyUser = new User();
 
         // in this list we will store the movies, until we convert them into a list of Strings
         ArrayList<Video> videoList;
@@ -401,7 +432,17 @@ public final class Action {
             }
 
             case RATINGS -> {
-                videoList = new ArrayList<Video>(commandUser.searchMoviesByRating(movies,
+                videoList = new ArrayList<Video>(dummyUser.searchMoviesByRating(movies,
+                                                                                filterYear,
+                                                                                filterGenres,
+                                                                                sortType));
+
+                return Utils.listOfVideoToListOfString(videoList, number);
+            }
+
+            case FAVORITE -> {
+                videoList = new ArrayList<Video>(dummyUser.searchMoviesByFavorite(movies,
+                                                                                  users,
                                                                                   filterYear,
                                                                                   filterGenres,
                                                                                   sortType));
@@ -409,31 +450,21 @@ public final class Action {
                 return Utils.listOfVideoToListOfString(videoList, number);
             }
 
-            case FAVORITE -> {
-                videoList = new ArrayList<Video>(commandUser.searchMoviesByFavorite(movies,
-                                                                                    users,
-                                                                                    filterYear,
-                                                                                    filterGenres,
-                                                                                    sortType));
-
-                return Utils.listOfVideoToListOfString(videoList, number);
-            }
-
             case LONGEST -> {
-                videoList = new ArrayList<Video>(commandUser.searchMoviesByDuration(movies,
-                                                                                    filterYear,
-                                                                                    filterGenres,
-                                                                                    sortType));
+                videoList = new ArrayList<Video>(dummyUser.searchMoviesByDuration(movies,
+                                                                                  filterYear,
+                                                                                  filterGenres,
+                                                                                  sortType));
 
                 return Utils.listOfVideoToListOfString(videoList, number);
             }
 
             case MOST_VIEWED -> {
-                videoList = new ArrayList<Video>(commandUser.searchMoviesByViews(movies,
-                                                                                 users,
-                                                                                 filterYear,
-                                                                                 filterGenres,
-                                                                                 sortType));
+                videoList = new ArrayList<Video>(dummyUser.searchMoviesByViews(movies,
+                                                                               users,
+                                                                               filterYear,
+                                                                               filterGenres,
+                                                                               sortType));
 
                 return Utils.listOfVideoToListOfString(videoList, number);
             }
@@ -456,7 +487,7 @@ public final class Action {
                                             final int filterYear,
                                             final List<String> filterGenres) {
         // dummy user used only for method call
-        User commandUser = new User();
+        User dummyUser = new User();
 
         // in this list we will store the serials, until we convert them into a list of Strings
         ArrayList<Video> videoList;
@@ -467,7 +498,17 @@ public final class Action {
             }
 
             case RATINGS -> {
-                videoList = new ArrayList<Video>(commandUser.searchSerialsByRating(serials,
+                videoList = new ArrayList<Video>(dummyUser.searchSerialsByRating(serials,
+                                                                                 filterYear,
+                                                                                 filterGenres,
+                                                                                 sortType));
+
+                return Utils.listOfVideoToListOfString(videoList, number);
+            }
+
+            case FAVORITE -> {
+                videoList = new ArrayList<Video>(dummyUser.searchSerialsByFavorite(serials,
+                                                                                   users,
                                                                                    filterYear,
                                                                                    filterGenres,
                                                                                    sortType));
@@ -475,31 +516,21 @@ public final class Action {
                 return Utils.listOfVideoToListOfString(videoList, number);
             }
 
-            case FAVORITE -> {
-                videoList = new ArrayList<Video>(commandUser.searchSerialsByFavorite(serials,
-                                                                                     users,
-                                                                                     filterYear,
-                                                                                     filterGenres,
-                                                                                     sortType));
-
-                return Utils.listOfVideoToListOfString(videoList, number);
-            }
-
             case LONGEST -> {
-                videoList = new ArrayList<>(commandUser.searchSerialsByDuration(serials,
-                                                                                filterYear,
-                                                                                filterGenres,
-                                                                                sortType));
+                videoList = new ArrayList<>(dummyUser.searchSerialsByDuration(serials,
+                                                                              filterYear,
+                                                                              filterGenres,
+                                                                              sortType));
 
                 return Utils.listOfVideoToListOfString(videoList, number);
             }
 
             case MOST_VIEWED -> {
-                videoList = new ArrayList<Video>(commandUser.searchSerialsByViews(serials,
-                                                                                  users,
-                                                                                  filterYear,
-                                                                                  filterGenres,
-                                                                                  sortType));
+                videoList = new ArrayList<Video>(dummyUser.searchSerialsByViews(serials,
+                                                                                users,
+                                                                                filterYear,
+                                                                                filterGenres,
+                                                                                sortType));
 
                 return Utils.listOfVideoToListOfString(videoList, number);
             }

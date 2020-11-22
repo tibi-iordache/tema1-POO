@@ -1,4 +1,2 @@
 Starting audit...
-[ERROR] /home/tibi/Automatica/an2/sem1/POO/teme/tema1/./src/utils/Action.java:16:31: Using the '.*' form of import should be avoided - common.Constants.*. [AvoidStarImport]
 Audit done.
-Checkstyle ends with 1 errors.

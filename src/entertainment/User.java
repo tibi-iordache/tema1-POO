@@ -17,9 +17,15 @@ import databases.MovieDataBase;
 import databases.SerialDataBase;
 import databases.UserDataBase;
 import utils.Utils;
-import static common.Constants.PREMIUM;
+
+import static common.Constants.SUCCESS;
+import static common.Constants.DUPLICATE;
+import static common.Constants.ALREADY_RATED;
+import static common.Constants.NOT_SEEN;
 import static common.Constants.ASCENDING;
 import static common.Constants.DESCENDING;
+import static common.Constants.CANNOT_BE_APPLIED;
+import static common.Constants.PREMIUM;
 
 public final class User implements Command, Query, Suggestions {
     private final String username;
@@ -73,13 +79,13 @@ public final class User implements Command, Query, Suggestions {
             if (!favoriteMovies.contains(video)) {
                 favoriteMovies.add(video);
 
-                return "success";
+                return SUCCESS;
             }
 
-            return "duplicate";
+            return DUPLICATE;
         }
 
-        return "not seen";
+        return NOT_SEEN;
     }
 
     @Override
@@ -111,13 +117,13 @@ public final class User implements Command, Query, Suggestions {
                     }
                 }
 
-                return "success";
+                return SUCCESS;
             }
 
-            return "already rated";
+            return ALREADY_RATED;
         }
 
-        return "not seen";
+        return NOT_SEEN;
     }
 
     @Override
@@ -145,10 +151,10 @@ public final class User implements Command, Query, Suggestions {
                         }
                     }
 
-                    return "success";
+                    return SUCCESS;
                 }
 
-                return "already rated";
+                return ALREADY_RATED;
             } else {
                 // else we add the grade to the user serial rating list
                 Map<Integer, Double> seasonGrade = new HashMap<Integer, Double>();
@@ -164,11 +170,11 @@ public final class User implements Command, Query, Suggestions {
                     }
                 }
 
-                return "success";
+                return SUCCESS;
             }
         }
 
-        return "not seen";
+        return NOT_SEEN;
     }
 
     @Override
@@ -268,7 +274,7 @@ public final class User implements Command, Query, Suggestions {
     public ArrayList<Actor> searchActorsByAwards(final ActorDataBase actors,
                                                  final List<String> awardsSearched,
                                                  final String sortType) {
-        // the list with all the actors who have the awards searched
+        // the list with all the actors which have the awards searched
         ArrayList<Actor> awardedActors = new ArrayList<Actor>();
 
         // iterate through the actors data base
@@ -362,7 +368,7 @@ public final class User implements Command, Query, Suggestions {
                                                  final int year,
                                                  final List<String> genre,
                                                  final String sortType) {
-        // form a new list
+        // form a new list that will contain only the movies with ratings
         ArrayList<Movie> ratedMovies = new ArrayList<Movie>();
 
         // iterate through each movie
@@ -394,7 +400,7 @@ public final class User implements Command, Query, Suggestions {
                                                    final int year,
                                                    final List<String> genre,
                                                    final String sortType) {
-        // form the list
+        // form the list that will contain only the serials with ratings
         ArrayList<Serial> ratedSerials = new ArrayList<Serial>();
 
         for (Serial serialIterator : serials.getSerials()) {
@@ -424,7 +430,7 @@ public final class User implements Command, Query, Suggestions {
                                                     final int year,
                                                     final List<String> genre,
                                                     final String sortType) {
-        // form the list
+        // form the list with the movies that appear in the user favorite list
         ArrayList<Movie> favoriteMoviesList = new ArrayList<Movie>();
 
         for (Movie movieIterator : movies.getMovies()) {
@@ -469,7 +475,7 @@ public final class User implements Command, Query, Suggestions {
                                               final int year,
                                               final List<String> genre,
                                               final String sortType) {
-        // the new list
+        // form the list with the serials that appear in the user favorite list
         ArrayList<Serial> favoriteSerialsList = new ArrayList<Serial>();
 
         for (Serial serialIterator : serials.getSerials()) {
@@ -513,7 +519,7 @@ public final class User implements Command, Query, Suggestions {
                                                    final int year,
                                                    final List<String> genre,
                                                    final String sortType) {
-        // the new list
+        // the new list with the movies that will pass the filters
         ArrayList<Movie> longestMovies = new ArrayList<Movie>();
 
         for (Movie movieIterator : movies.getMovies()) {
@@ -554,7 +560,7 @@ public final class User implements Command, Query, Suggestions {
                                                      final int year,
                                                      final List<String> genre,
                                                      final String sortType) {
-        // new list
+        // new list with the serials that pass the filters
         ArrayList<Serial> longestSerials = new ArrayList<Serial>();
 
         for (Serial serialIterator : serials.getSerials()) {
@@ -596,7 +602,7 @@ public final class User implements Command, Query, Suggestions {
                                                  final int year,
                                                  final List<String> genre,
                                                  final String sortType) {
-        // the new list
+        // the new list with the movies that have been watched by the users
         ArrayList<Movie> mostViewedMovies = new ArrayList<Movie>();
 
         for (Movie movieIterator : movies.getMovies()) {
@@ -642,7 +648,7 @@ public final class User implements Command, Query, Suggestions {
                                                   final int year,
                                                   final List<String> genre,
                                                   final String sortType) {
-        // the new list
+        // the new list with the serials that have been watched by the users
         ArrayList<Serial> mostViewedSerials = new ArrayList<Serial>();
 
         for (Serial serialIterator : serials.getSerials()) {
@@ -701,7 +707,7 @@ public final class User implements Command, Query, Suggestions {
         }
 
         // the user saw all the videos from the database
-        return "cannot be applied!";
+        return CANNOT_BE_APPLIED;
     }
 
     @Override
@@ -725,7 +731,7 @@ public final class User implements Command, Query, Suggestions {
         }
 
         // if we didn't find any video, return error message
-        return "cannot be applied!";
+        return CANNOT_BE_APPLIED;
     }
 
     @Override
@@ -761,7 +767,7 @@ public final class User implements Command, Query, Suggestions {
             }
         }
 
-        return "cannot be applied!";
+        return CANNOT_BE_APPLIED;
     }
 
     @Override
@@ -779,7 +785,6 @@ public final class User implements Command, Query, Suggestions {
                                                     .getNumberOfFavorites(users)).reversed());
 
         // check the subscription type
-
         if (this.getSubscriptionType() != null
                 && this.getSubscriptionType().equals(PREMIUM)) {
             for (Video videoIterator : videos) {
@@ -791,7 +796,7 @@ public final class User implements Command, Query, Suggestions {
         }
 
 
-        return "cannot be applied!";
+        return CANNOT_BE_APPLIED;
     }
 
     @Override
